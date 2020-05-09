@@ -37,9 +37,7 @@ public class register extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(TAG, "1");
         setContentView(R.layout.activity_register);
-        Log.e(TAG, "2");
 
         mFullName   = findViewById(R.id.fullName);
         mEmail      = findViewById(R.id.Email);
