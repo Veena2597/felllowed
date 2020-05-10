@@ -11,26 +11,28 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:text="Authenticator App"
-        android:textColor="#FFEB3B"
-        android:textSize="25sp"
+        android:fontFamily="@font/aclonica"
+        android:includeFontPadding="false"
+        android:text="FELLOWED"
+        android:textColor="#000000"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.19" />
+        app:layout_constraintVertical_bias="0.207" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-
+        android:layout_marginTop="48dp"
         android:text="Create New Account"
-        android:textColor="#F7F7F8"
+        android:textColor="#000000"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -40,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@android:color/black"
+        android:background="#E6E6E6"
         android:ems="10"
 
         android:hint="Full Name"
@@ -51,9 +53,10 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.13999999" />
+        app:layout_constraintVertical_bias="0.095" />
 
     <EditText
         android:id="@+id/Email"
@@ -64,7 +67,7 @@
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:hint="Email"
-        android:background="@android:color/black"
+        android:background="#E6E6E6"
 
         android:padding="10dp"
         android:textColor="#FFFFFF"
@@ -85,7 +88,7 @@
         android:ems="10"
         android:inputType="textPassword"
         android:hint="Password"
-        android:background="@android:color/black"
+        android:background="#E6E6E6"
 
         android:padding="10dp"
         android:textColor="#FFFFFF"
@@ -104,10 +107,10 @@
         android:ems="10"
         android:inputType="textPhonetic"
         android:hint="Phone"
-        android:background="@android:color/black"
+        android:background="#E6E6E6"
 
         android:padding="10dp"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textColorHint="#FFFFFF"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -134,7 +137,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Already Registered ? Login Here"
-        android:textColor="#FFEB3B"
+        android:textColor="#0000FF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registerBtn" />
