@@ -74,7 +74,7 @@ public class register extends AppCompatActivity {
                 }
 
                 if(password.length() < 6){
-                    mPassword.setError("Password Must be >= 6 Characters");
+                    mPassword.setError("Oops! Password less than 6 Characters");
                     return;
                 }
 
@@ -128,14 +128,13 @@ public class register extends AppCompatActivity {
             }
         });
 
-
-
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),login.class));
-            }
-        });
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(getApplicationContext(),login.class));
+                }
 
+        });
     }
 }
+
