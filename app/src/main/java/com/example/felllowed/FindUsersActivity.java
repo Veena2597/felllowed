@@ -1,15 +1,17 @@
 package com.example.felllowed;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -26,15 +28,23 @@ import com.google.android.gms.tasks.Task;
 
 public class FindUsersActivity extends FragmentActivity implements OnMapReadyCallback {
     final String TAG = "FUA";
+    public static boolean fromSetting = false;
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
+
     private static final int REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_users);
+
+        //check of location is enabled
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        checkLocationEnabled(locationManager);
+
+        Log.e("onCreate", "after location setting");
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLocation();
@@ -66,6 +76,47 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                     fetchLocation();
                 }
                 break;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+            super.onResume();
+            Log.e("onResume", "entered here");
+            if(fromSetting == true){
+                finish();
+                fromSetting = false;
+                startActivity(getIntent());
+            }
+    }
+
+
+    private void checkLocationEnabled(LocationManager locationManager){
+        final Context context = getApplicationContext();
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+        try {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager. GPS_PROVIDER ) ;
+        } catch (Exception e) {
+            e.printStackTrace() ;
+        }
+        try {
+            network_enabled = locationManager.isProviderEnabled(LocationManager. NETWORK_PROVIDER ) ;
+        } catch (Exception e) {
+            e.printStackTrace() ;
+        }
+        if(!gps_enabled && !network_enabled) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Enable Location")  // GPS not found
+                    .setMessage("For better results, turn on your device location service.") // Want to enable?
+                    .setPositiveButton("LOCATION SETTINGS", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            fromSetting = true;
+                        }
+                    })
+                    .setNegativeButton("CANCEL", null)
+                    .show();
         }
     }
 
