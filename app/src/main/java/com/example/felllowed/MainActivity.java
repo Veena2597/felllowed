@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +18,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity{
-
+    final String TAG = "MA";
     private ArrayList<String> eventArray;
     private ArrayAdapter adapter;
 
@@ -32,6 +40,18 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.appToolbar);
         setSupportActionBar(myToolbar);
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        FindLocation findLocation = new FindLocation(locationManager, getApplicationContext());
+        findLocation.main();
+        Log.e(TAG, String.valueOf(findLocation.currentLocation));
+        final String latti = String.valueOf(findLocation.currentLocation);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference myRef = database.getReference("Location").child(currentuser);
+        myRef.setValue(latti);
+        Log.e(TAG,currentuser);
     }
 
     @Override
