@@ -22,6 +22,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/** Login Activity handles:
+* 1. Authentication of user with firebase
+* 2. Handle forgotten password case
+* */
 public class login extends AppCompatActivity {
     EditText mEmail,mPassword;
     Button mLoginBtn;
@@ -33,6 +37,7 @@ public class login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        getSupportActionBar().hide();
 
         mEmail = findViewById(R.id.Email);
         mPassword = findViewById(R.id.password);
@@ -58,16 +63,9 @@ public class login extends AppCompatActivity {
                     mPassword.setError("Password is Required.");
                     return;
                 }
-
-                if(password.length() < 6){
-                    mPassword.setError("Password Must be >= 6 Characters");
-                    return;
-                }
-
                 progressBar.setVisibility(View.VISIBLE);
 
                 // authenticate the user
-
                 fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -98,9 +96,10 @@ public class login extends AppCompatActivity {
 
                 final EditText resetMail = new EditText(v.getContext());
                 final AlertDialog.Builder passwordResetDialog = new AlertDialog.Builder(v.getContext());
-                passwordResetDialog.setTitle("Reset Password ?");
-                passwordResetDialog.setMessage("Enter Your Email To Received Reset Link.");
-                passwordResetDialog.setView(resetMail);
+                passwordResetDialog.setTitle("Reset Password ?")
+                        .setMessage("Enter Your Email To Received Reset Link.")
+                        .setView(resetMail);
+
 
                 passwordResetDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -121,23 +120,13 @@ public class login extends AppCompatActivity {
 
                     }
                 });
-
                 passwordResetDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // close the dialog
                     }
                 });
-
                 passwordResetDialog.create().show();
-
-            }
-        });
-
-        mCreateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),register.class));
             }
         });
     }

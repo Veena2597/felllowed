@@ -24,13 +24,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 public class FindLocation extends FragmentActivity implements OnMapReadyCallback {
-    final String TAG = "FUA";
+    final String TAG = "FL";
     public static boolean fromSetting = false;
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationManager locationManager;
     Context context;
+    Location var;
 
     private static final int REQUEST_CODE = 101;
 
@@ -41,21 +42,17 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
 
     public void main() {
         //check of location is enabled
-
         checkLocationEnabled(locationManager);
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-        fetchLocation();
-        Log.e("FL","main");
+        var = fetchLocation();
+        Log.e(TAG, String.valueOf(currentLocation));
+        Log.e(TAG, String.valueOf(var));
     }
 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         Log.e("FL","onMapReady");
-
-
     }
 
     @Override
@@ -97,12 +94,12 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void fetchLocation() {
+    private Location fetchLocation() {
         if (ActivityCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-            return;
+            return null;
         }
         Task<Location> task = fusedLocationProviderClient.getLastLocation();
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -110,8 +107,12 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
             public void onSuccess(Location location) {
                 if (location != null) {
                     currentLocation = location;
+                    Log.e("1", String.valueOf(currentLocation));
                 }
+                Log.e("2", String.valueOf(currentLocation));
             }
         });
+        Log.e("3", String.valueOf(currentLocation));
+        return currentLocation;
     }
 }

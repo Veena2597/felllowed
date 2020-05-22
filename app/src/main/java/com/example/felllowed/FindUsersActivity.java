@@ -54,7 +54,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         checkLocationEnabled(locationManager);
 
-        Log.e("onCreate", "after location setting");
+        Log.e(TAG, "after location setting");
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLocation();

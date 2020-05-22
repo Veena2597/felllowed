@@ -24,9 +24,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.lang.reflect.Member;
-import java.util.HashMap;
-import java.util.Map;
+/** Register activity handles :
+* 1. Checking if user already exists and redirects to MainActivity
+* 2. Create user according to rules set in button.onClickListener
+*    and creates a child under "Users" document in Firebase
+* 3. Handle forgotten password case
+* 4. Redirect to Login activity on login.onClickListener
+*/
 
 public class register extends AppCompatActivity {
     public static final String TAG = "TAG";
@@ -35,12 +39,14 @@ public class register extends AppCompatActivity {
     TextView mLoginBtn;
     FirebaseAuth fAuth;
     ProgressBar progressBar;
-    //FirebaseFirestore fStore;
     String userID;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().hide();
 
         mUserName   = findViewById(R.id.fullName);
         mEmail      = findViewById(R.id.Email);
@@ -50,9 +56,9 @@ public class register extends AppCompatActivity {
         mLoginBtn   = findViewById(R.id.createText);
 
         fAuth = FirebaseAuth.getInstance();
-        //fStore = FirebaseFirestore.getInstance();
         progressBar = findViewById(R.id.progressBar);
 
+        //Check if user already exists and redirects if yes
         if(fAuth.getCurrentUser() != null){
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
             finish();
@@ -84,7 +90,6 @@ public class register extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
 
                 // register the user in firebase
-
                 fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -110,17 +115,6 @@ public class register extends AppCompatActivity {
                             DatabaseReference databaseReference = database.getReference("Users").child(userID);
                             member user = new member(userName,email,phone);
                             databaseReference.setValue(user);
-                            /*documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: user Profile is created for "+ userID);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: " + e.toString());
-                                }
-                            });*/
                             startActivity(new Intent(getApplicationContext(),MainActivity.class));
 
                         }else {
