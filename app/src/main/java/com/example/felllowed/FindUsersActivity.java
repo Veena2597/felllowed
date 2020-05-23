@@ -10,13 +10,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FindUsersActivity extends FragmentActivity implements OnMapReadyCallback {
     final String TAG = "FUA";
@@ -48,7 +54,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         checkLocationEnabled(locationManager);
 
-        Log.e("onCreate", "after location setting");
+        Log.e(TAG, "after location setting");
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLocation();
@@ -69,6 +75,17 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 .strokeWidth(1)
                 .strokeColor(0x000033CC)
                 .fillColor(0x88CCDDFF));
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        /*DatabaseReference myRef = database.getReference("Location").child(currentuser);
+        Map<String, Double> loc = new HashMap<>();
+        loc.put("Latitude", currentLocation.getLatitude());
+        loc.put("Longitude", currentLocation.getLongitude());
+        myRef.setValue(loc);*/
+        DatabaseReference myRef = database.getReference("LocationGeo");
+        GeoFire geoFire = new GeoFire(myRef);
+        geoFire.setLocation("firebase-hq", new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
 
     }
 
@@ -143,5 +160,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 }
             }
         });
+
     }
 }

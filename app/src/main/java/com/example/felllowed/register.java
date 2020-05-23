@@ -21,25 +21,34 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Map;
+/** Register activity handles :
+* 1. Checking if user already exists and redirects to MainActivity
+* 2. Create user according to rules set in button.onClickListener
+*    and creates a child under "Users" document in Firebase
+* 3. Handle forgotten password case
+* 4. Redirect to Login activity on login.onClickListener
+*/
 
 public class register extends AppCompatActivity {
     public static final String TAG = "TAG";
-    EditText mFullName,mEmail,mPassword,mPhone;
+    EditText mUserName,mEmail,mPassword,mPhone;
     Button mRegisterBtn;
     TextView mLoginBtn;
     FirebaseAuth fAuth;
     ProgressBar progressBar;
-    //FirebaseFirestore fStore;
     String userID;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().hide();
 
-        mFullName   = findViewById(R.id.fullName);
+        mUserName   = findViewById(R.id.fullName);
         mEmail      = findViewById(R.id.Email);
         mPassword   = findViewById(R.id.password);
         mPhone      = findViewById(R.id.phone);
@@ -47,9 +56,9 @@ public class register extends AppCompatActivity {
         mLoginBtn   = findViewById(R.id.createText);
 
         fAuth = FirebaseAuth.getInstance();
-        //fStore = FirebaseFirestore.getInstance();
         progressBar = findViewById(R.id.progressBar);
 
+        //Check if user already exists and redirects if yes
         if(fAuth.getCurrentUser() != null){
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
             finish();
@@ -60,7 +69,7 @@ public class register extends AppCompatActivity {
             public void onClick(View v) {
                 final String email = mEmail.getText().toString().trim();
                 String password = mPassword.getText().toString().trim();
-                final String fullName = mFullName.getText().toString();
+                final String userName = mUserName.getText().toString();
                 final String phone    = mPhone.getText().toString();
 
                 if(TextUtils.isEmpty(email)){
@@ -81,7 +90,6 @@ public class register extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
 
                 // register the user in firebase
-
                 fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -101,12 +109,6 @@ public class register extends AppCompatActivity {
 
                             Toast.makeText(register.this, "User Created.", Toast.LENGTH_SHORT).show();
                             userID = fAuth.getCurrentUser().getUid();
-                            //DocumentReference documentReference = fStore.collection("users").document(userID);
-                            Map<String,Object> user = new HashMap<>();
-                            user.put("fName",fullName);
-                            user.put("email",email);
-                            user.put("phone",phone);
-                            //hello
                             /*documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -118,6 +120,12 @@ public class register extends AppCompatActivity {
                                     Log.d(TAG, "onFailure: " + e.toString());
                                 }
                             });*/
+                            // Write a message to the database
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference databaseReference = database.getReference("Users").child(userID);
+                            member user = new member(userName,email);
+                            databaseReference.setValue(user);
+
                             startActivity(new Intent(getApplicationContext(),MainActivity.class));
 
                         }else {
