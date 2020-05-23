@@ -17,12 +17,17 @@ import android.util.Log;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,8 +35,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,9 +70,10 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
 
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
+        //Set Marker
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("Current User");
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("Current User").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (float) 15.5));
         googleMap.addMarker(markerOptions);
@@ -76,8 +85,8 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 .strokeColor(0x000033CC)
                 .fillColor(0x88CCDDFF));
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
         /*DatabaseReference myRef = database.getReference("Location").child(currentuser);
         Map<String, Double> loc = new HashMap<>();
         loc.put("Latitude", currentLocation.getLatitude());
@@ -87,6 +96,61 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         GeoFire geoFire = new GeoFire(myRef);
         geoFire.setLocation(currentuser, new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
 
+        /*//Dummy
+        //geoFire.setLocation("test0", new GeoLocation(34.417772, -119.859786));
+        geoFire.setLocation("test1", new GeoLocation(34.421737, -119.859442));//Outside
+        geoFire.setLocation("test2", new GeoLocation(34.418798, -119.855837));
+        geoFire.setLocation("test3", new GeoLocation(34.417736, -119.856739));
+        geoFire.setLocation("test4", new GeoLocation(34.414794, -119.858198));
+        geoFire.setLocation("test5", new GeoLocation(34.415300, -119.860832));//Border
+        geoFire.setLocation("test6", new GeoLocation(34.421342, -119.852796));//Outside
+        geoFire.setLocation("test7", new GeoLocation(34.416802, -119.860064));
+        geoFire.setLocation("test8", new GeoLocation(34.416901, -119.854561));
+        geoFire.setLocation("test9", new GeoLocation(34.419122, -119.859077));*/
+
+        // creates a new query around [currentLatitude, currentLongitude] with a radius of 0.25mil
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()), 0.405);
+
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(final String key, final GeoLocation location) {
+                //Get Username from database
+                DatabaseReference myRef = database.getReference("Users").child(key).child("user");
+                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        final String user = dataSnapshot.getValue(String.class);
+                        LatLng latLng = new LatLng(location.latitude, location.longitude);
+                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(user);
+                        googleMap.addMarker(markerOptions);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+                //Log.e(TAG,String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                System.out.println(String.format("Key %s is no longer in the search area", key));
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                System.out.println("All initial data has been loaded and events have been fired!");
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+                System.err.println("There was an error with this query: " + error);
+            }
+        });
     }
 
     @Override

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity{
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FindLocation findLocation = new FindLocation(locationManager, getApplicationContext());
         findLocation.main();
-        Log.e(TAG, String.valueOf(findLocation.currentLocation));
+        //Log.e(TAG, String.valueOf(findLocation.currentLocation));
         final String currentLoc_str = String.valueOf(findLocation.currentLocation);
 
         //Update current location to database "Location" document child
