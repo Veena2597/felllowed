@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.appToolbar);
         setSupportActionBar(myToolbar);
+
     }
 
     @Override
@@ -74,8 +76,6 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-
-
     /**
      * Handler function that determines what happens when an option is pressed in the Action Bar.
      */
@@ -100,6 +100,11 @@ public class MainActivity extends AppCompatActivity{
         intent.addCategory(Intent.CATEGORY_HOME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 
     public class TagActivityPair{
