@@ -39,7 +39,7 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
         this.locationManager = locationManager;
         this.context = context;
     }
-    //Why veena. Why you do this to me?
+
     public void main() {
         //check of location is enabled
         checkLocationEnabled(locationManager);
@@ -51,12 +51,12 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
             public void onSuccess(Location location) {
                 if (location != null) {
                     currentLocation = location;
-                    Log.e("1", String.valueOf(currentLocation));
+                    Log.e("11", String.valueOf(currentLocation));
                 }
-                Log.e("2", String.valueOf(currentLocation));
+                Log.e("22", String.valueOf(currentLocation));
             }
         });
-        Log.e("3", String.valueOf(currentLocation));
+        Log.e("33", String.valueOf(currentLocation));
         Log.e(TAG, String.valueOf(currentLocation));
         Log.e(TAG, String.valueOf(var));
     }
