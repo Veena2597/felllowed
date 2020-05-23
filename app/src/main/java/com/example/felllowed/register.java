@@ -123,7 +123,7 @@ public class register extends AppCompatActivity {
                             // Write a message to the database
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference databaseReference = database.getReference("Users").child(userID);
-                            member user = new member(userName,email);
+                            member user = new member(userName,email, phone);
                             databaseReference.setValue(user);
 
                             startActivity(new Intent(getApplicationContext(),MainActivity.class));

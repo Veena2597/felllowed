@@ -85,7 +85,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         myRef.setValue(loc);*/
         DatabaseReference myRef = database.getReference("LocationGeo");
         GeoFire geoFire = new GeoFire(myRef);
-        geoFire.setLocation("firebase-hq", new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
+        geoFire.setLocation(currentuser, new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
 
     }
 
