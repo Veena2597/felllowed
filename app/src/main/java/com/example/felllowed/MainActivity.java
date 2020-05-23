@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-    //Handler function that determines what happens when an option is pressed in the Action Bar.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
@@ -119,5 +118,19 @@ public class MainActivity extends AppCompatActivity{
         intent.addCategory(Intent.CATEGORY_HOME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
+
+    public class TagActivityPair{
+        private String tag;
+        private String activity;
+
+        public TagActivityPair(String tag) {
+            this.tag = tag;
+        }
     }
 }

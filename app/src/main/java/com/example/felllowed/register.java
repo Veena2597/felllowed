@@ -109,12 +109,23 @@ public class register extends AppCompatActivity {
 
                             Toast.makeText(register.this, "User Created.", Toast.LENGTH_SHORT).show();
                             userID = fAuth.getCurrentUser().getUid();
-
+                            /*documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: user Profile is created for "+ userID);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: " + e.toString());
+                                }
+                            });*/
                             // Write a message to the database
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference databaseReference = database.getReference("Users").child(userID);
-                            member user = new member(userName,email,phone);
+                            member user = new member(userName,email);
                             databaseReference.setValue(user);
+
                             startActivity(new Intent(getApplicationContext(),MainActivity.class));
 
                         }else {
