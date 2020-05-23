@@ -39,7 +39,7 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
         this.locationManager = locationManager;
         this.context = context;
     }
-
+    //Why veena. Why you do this to me?
     public void main() {
         //check of location is enabled
         checkLocationEnabled(locationManager);
