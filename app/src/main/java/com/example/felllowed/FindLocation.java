@@ -45,6 +45,18 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
         checkLocationEnabled(locationManager);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         var = fetchLocation();
+        Task<Location> task = fusedLocationProviderClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    currentLocation = location;
+                    Log.e("11", String.valueOf(currentLocation));
+                }
+                Log.e("22", String.valueOf(currentLocation));
+            }
+        });
+        Log.e("33", String.valueOf(currentLocation));
         Log.e(TAG, String.valueOf(currentLocation));
         Log.e(TAG, String.valueOf(var));
     }
