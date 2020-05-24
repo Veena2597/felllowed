@@ -14,6 +14,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -41,12 +46,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FindUsersActivity extends FragmentActivity implements OnMapReadyCallback {
     final String TAG = "FUA";
     public static boolean fromSetting = false;
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+    private ArrayList<String> userArray;
+    private ArrayList<String> uidArray;
+    private ArrayAdapter adapter;
+    private ListView userList;
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -62,10 +76,37 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         checkLocationEnabled(locationManager);
 
-        Log.e(TAG, "after location setting");
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLocation();
+
+        //Create new list of users
+        userArray = new ArrayList<String>();
+        uidArray = new ArrayList<String>();
+        userList = findViewById(R.id.userlist);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userArray);
+        userList.setAdapter(adapter);
+
+        final DatabaseReference myfrndsRef = database.getReference("Users").child(currentuser).child("friends");
+        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                new AlertDialog.Builder(FindUsersActivity.this)
+                        .setTitle("Add Friend")
+                        .setMessage("Want to add "+userArray.get(position)+" as friend?")
+                        .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //update friends
+                                Toast.makeText(FindUsersActivity.this, "Added "+userArray.get(position)+" as friend",Toast.LENGTH_SHORT).show();
+                                //register.user.updateFriendsList(userArray.get(position));
+                                Map<String, Object> userUpdates = new HashMap<>();
+                                userUpdates.put(uidArray.get(position), userArray.get(position));
+                                myfrndsRef.updateChildren(userUpdates);
+                            }
+                        })
+                        .setNegativeButton("CANCEL", null)
+                        .show();
+            }
+        });
     }
 
 
@@ -75,23 +116,17 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("Current User").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (float) 15.5));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (float) 15));
         googleMap.addMarker(markerOptions);
 
-        Circle circle = googleMap.addCircle(new CircleOptions()
+        googleMap.addCircle(new CircleOptions()
                 .center(latLng)
                 .radius(400)
                 .strokeWidth(1)
                 .strokeColor(0x000033CC)
                 .fillColor(0x88CCDDFF));
 
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        /*DatabaseReference myRef = database.getReference("Location").child(currentuser);
-        Map<String, Double> loc = new HashMap<>();
-        loc.put("Latitude", currentLocation.getLatitude());
-        loc.put("Longitude", currentLocation.getLongitude());
-        myRef.setValue(loc);*/
+
         DatabaseReference myRef = database.getReference("LocationGeo");
         GeoFire geoFire = new GeoFire(myRef);
         geoFire.setLocation(currentuser, new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
@@ -119,16 +154,24 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        //Get user and add marker in map
                         final String user = dataSnapshot.getValue(String.class);
+
                         LatLng latLng = new LatLng(location.latitude, location.longitude);
                         MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(user);
                         googleMap.addMarker(markerOptions);
+
+                        //Add user to list
+                        if(user != null) {
+                            userArray.add(user);
+                            uidArray.add(key);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
-                //Log.e(TAG,String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
@@ -174,7 +217,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 startActivity(getIntent());
             }
     }
-
 
     private void checkLocationEnabled(LocationManager locationManager){
         final Context context = getApplicationContext();

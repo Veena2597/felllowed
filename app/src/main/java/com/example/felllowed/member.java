@@ -1,5 +1,10 @@
 package com.example.felllowed;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class member {
     private String username;
     private String email;
@@ -7,6 +12,8 @@ public class member {
     private String phone;
     private Double latitude;
     private Double longitude;
+    private List<String> friends = new ArrayList<>();
+    private int numFriends = 0;
 
     public member(String username, String email, String phone){
         this.username = username;
@@ -38,5 +45,10 @@ public class member {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public void updateFriendsList(String username){
+        System.out.println(username);
+        friends.add(username);
+        //numFriends++;
     }
 }
