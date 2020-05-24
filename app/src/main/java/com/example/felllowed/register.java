@@ -24,6 +24,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.lang.reflect.Member;
+
 /** Register activity handles :
 * 1. Checking if user already exists and redirects to MainActivity
 * 2. Create user according to rules set in button.onClickListener
@@ -34,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class register extends AppCompatActivity {
     public static final String TAG = "TAG";
+    static member user;
     EditText mUserName,mEmail,mPassword,mPhone;
     Button mRegisterBtn;
     TextView mLoginBtn;
@@ -113,7 +116,7 @@ public class register extends AppCompatActivity {
                             // Write a message to the database
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference databaseReference = database.getReference("Users").child(userID);
-                            member user = new member(userName,email,phone);
+                            user = new member(userName,email,phone);
                             databaseReference.setValue(user);
                             startActivity(new Intent(getApplicationContext(),MainActivity.class));
 

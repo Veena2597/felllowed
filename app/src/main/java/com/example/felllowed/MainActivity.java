@@ -1,7 +1,12 @@
 package com.example.felllowed;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,9 +17,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -24,7 +37,7 @@ import java.util.ArrayList;
 /* MainActivity handles:
 * 1. Check if location service is accessible
 * 2. Sign out of app
-* 3. Send current location ToDo: Possibly every 1 min in general but every 10s if event has started (to monitor travel)
+* 3. Send current location
 * 4. List of all in-app activities:
 *       a. Find Users
 *       b. ToDo: Create events --create requests in this event or a separate activity
@@ -36,8 +49,13 @@ public class MainActivity extends AppCompatActivity{
     final String TAG = "MA";
     private ArrayList<String> eventArray;
     private ArrayAdapter adapter;
+    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationRequest mLocationRequest;
 
     private ListView eventList;
+    private static final int REQUEST_CODE = 101;
+    private double Latitude = 0.0, Longitude = 0.0;
+    public static boolean fromSetting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +65,39 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(myToolbar);
 
         //Get current location
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        FindLocation findLocation = new FindLocation(locationManager, getApplicationContext());
-        findLocation.main();
-        //Log.e(TAG, String.valueOf(findLocation.currentLocation));
-        final String currentLoc_str = String.valueOf(findLocation.currentLocation);
+        checkLocationEnabled(locationManager);
+        checkPermission();
 
-        //Update current location to database "Location" document child
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference myRef = database.getReference("Location").child(currentuser);
-        //myRef.setValue(currentLoc_str);
+        fusedLocationProviderClient = new FusedLocationProviderClient(this);
+        mLocationRequest = new LocationRequest();
+
+        mLocationRequest.setInterval(10*1000);
+        mLocationRequest.setFastestInterval(4*1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult){
+                super.onLocationResult(locationResult);
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        Latitude = location.getLatitude();
+                        Longitude = location.getLongitude();
+                        Log.e(TAG, String.valueOf(Latitude));
+
+                        DatabaseReference mygeoRef = database.getReference("LocationGeo");
+                        GeoFire geoFire = new GeoFire(mygeoRef);
+                        geoFire.setLocation(currentuser, new GeoLocation(Latitude, Longitude));
+                    }
+                }
+            }
+        }, getMainLooper());
     }
 
     @Override
@@ -119,5 +159,41 @@ public class MainActivity extends AppCompatActivity{
         intent.addCategory(Intent.CATEGORY_HOME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+
+    private void checkPermission(){
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+        }
+    }
+
+    private void checkLocationEnabled(LocationManager locationManager){
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+        try {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager. GPS_PROVIDER ) ;
+        } catch (Exception e) {
+            e.printStackTrace() ;
+        }
+        try {
+            network_enabled = locationManager.isProviderEnabled(LocationManager. NETWORK_PROVIDER ) ;
+        } catch (Exception e) {
+            e.printStackTrace() ;
+        }
+        if(!gps_enabled && !network_enabled) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Enable Location")  // GPS not found
+                    .setMessage("For better results, turn on your device location service.") // Want to enable?
+                    .setPositiveButton("LOCATION SETTINGS", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        }
+                    })
+                    .setNegativeButton("CANCEL", null)
+                    .show();
+        }
     }
 }
