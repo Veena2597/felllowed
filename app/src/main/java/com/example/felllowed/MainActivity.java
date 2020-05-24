@@ -13,12 +13,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -30,9 +28,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -42,7 +37,7 @@ import java.util.ArrayList;
 /* MainActivity handles:
 * 1. Check if location service is accessible
 * 2. Sign out of app
-* 3. Send current location ToDo: Possibly every 1 min in general but every 10s if event has started (to monitor travel)
+* 3. Send current location
 * 4. List of all in-app activities:
 *       a. Find Users
 *       b. ToDo: Create events --create requests in this event or a separate activity
@@ -69,11 +64,10 @@ public class MainActivity extends AppCompatActivity{
         Toolbar myToolbar = findViewById(R.id.appToolbar);
         setSupportActionBar(myToolbar);
 
+        //Get current location
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        //Get current location
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         checkLocationEnabled(locationManager);
         checkPermission();
 
@@ -95,6 +89,7 @@ public class MainActivity extends AppCompatActivity{
                     if (location != null) {
                         Latitude = location.getLatitude();
                         Longitude = location.getLongitude();
+                        Log.e(TAG, String.valueOf(Latitude));
 
                         DatabaseReference mygeoRef = database.getReference("LocationGeo");
                         GeoFire geoFire = new GeoFire(mygeoRef);
@@ -142,6 +137,7 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
+    //Handler function that determines what happens when an option is pressed in the Action Bar.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
@@ -165,19 +161,6 @@ public class MainActivity extends AppCompatActivity{
         startActivity(intent);
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-    }
-
-    public class TagActivityPair{
-        private String tag;
-        private String activity;
-
-        public TagActivityPair(String tag) {
-            this.tag = tag;
-        }
-    }
 
     private void checkPermission(){
         if (ActivityCompat.checkSelfPermission(
