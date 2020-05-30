@@ -128,6 +128,9 @@ public class MainActivity extends AppCompatActivity{
                     case 0:
                         intent = new Intent(MainActivity.this, FindUsersActivity.class);
                         break;
+                    case 1:
+                        intent = new Intent(MainActivity.this, AddEventActivity.class);
+                        break;
                     default:
                         intent = new Intent(MainActivity.this, MainActivity.class);
                 }
