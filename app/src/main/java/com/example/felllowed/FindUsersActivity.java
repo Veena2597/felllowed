@@ -176,22 +176,18 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
 
             @Override
             public void onKeyExited(String key) {
-                System.out.println(String.format("Key %s is no longer in the search area", key));
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
             public void onGeoQueryReady() {
-                System.out.println("All initial data has been loaded and events have been fired!");
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                System.err.println("There was an error with this query: " + error);
             }
         });
     }
@@ -210,7 +206,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     protected void onResume() {
             super.onResume();
-            Log.e("onResume", "entered here");
             if(fromSetting == true){
                 finish();
                 fromSetting = false;

@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity{
                     if (location != null) {
                         Latitude = location.getLatitude();
                         Longitude = location.getLongitude();
-                        Log.e(TAG, String.valueOf(Latitude));
 
                         DatabaseReference mygeoRef = database.getReference("LocationGeo");
                         GeoFire geoFire = new GeoFire(mygeoRef);
@@ -117,16 +116,19 @@ public class MainActivity extends AppCompatActivity{
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, eventArray);
         eventList.setAdapter(adapter);
         eventArray.add("Find Users");
+        eventArray.add("Add event");
         adapter.notifyDataSetChanged();
 
         eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final int posID = position;
                 Intent intent;
-                switch (posID){
+                switch (position){
                     case 0:
                         intent = new Intent(MainActivity.this, FindUsersActivity.class);
+                        break;
+                    case 1:
+                        intent = new Intent(MainActivity.this, AddEventActivity.class);
                         break;
                     default:
                         intent = new Intent(MainActivity.this, MainActivity.class);
