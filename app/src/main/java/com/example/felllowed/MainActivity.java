@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity{
                     if (location != null) {
                         Latitude = location.getLatitude();
                         Longitude = location.getLongitude();
-                        Log.e(TAG, String.valueOf(Latitude));
 
                         DatabaseReference mygeoRef = database.getReference("LocationGeo");
                         GeoFire geoFire = new GeoFire(mygeoRef);
@@ -117,6 +116,8 @@ public class MainActivity extends AppCompatActivity{
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, eventArray);
         eventList.setAdapter(adapter);
         eventArray.add("Find Users");
+        eventArray.add("Add Event");
+        eventArray.add("Forum");
         adapter.notifyDataSetChanged();
 
         eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -130,6 +131,9 @@ public class MainActivity extends AppCompatActivity{
                         break;
                     case 1:
                         intent = new Intent(MainActivity.this, AddEventActivity.class);
+                        break;
+                    case 2:
+                        intent = new Intent(MainActivity.this, EventForumActivity.class);
                         break;
                     default:
                         intent = new Intent(MainActivity.this, MainActivity.class);

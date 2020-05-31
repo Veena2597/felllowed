@@ -105,12 +105,9 @@ public class FindLocation extends FragmentActivity implements OnMapReadyCallback
             public void onSuccess(Location location) {
                 if (location != null) {
                     currentLocation = location;
-                    //Log.e("1", String.valueOf(currentLocation));
                 }
-                //Log.e("2", String.valueOf(currentLocation));
             }
         });
-        //Log.e("3", String.valueOf(currentLocation));
         return currentLocation;
     }
 }
