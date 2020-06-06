@@ -43,18 +43,20 @@ public class EventForumActivity extends AppCompatActivity {
         DatabaseReference databaseReference = database.getReference("Events");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                for(DataSnapshot snap : dataSnapshot.getChildren())
-                    if(snap.getKey().equals(currentUser))
-                        for(DataSnapshot snap1 : snap.getChildren()) {
-                            data = String.valueOf(snap1.getValue());
-                            if(init_flag == 0) {
+            public void onDataChange(@NonNull final DataSnapshot events_parent) {
+                for(DataSnapshot events_uid : events_parent.getChildren()) {
+                    if (events_uid.getKey().equals(currentUser)) {
+                        for (DataSnapshot events_num : events_uid.getChildren()) {
+                            data = String.valueOf(events_num.getValue());
+                            if (init_flag == 0) {
                                 userList = getListData(data, new ArrayList<EventItem>());
                                 init_flag = 1;
-                            }
-                            else
+                            } else{
                                 userList = getListData(data, userList);
+                            }
                         }
+                    }
+                }
                 final CustomListAdapter adapter = new CustomListAdapter(EventForumActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -62,18 +64,20 @@ public class EventForumActivity extends AppCompatActivity {
                 DatabaseReference friend_events = database.getReference("Users");
                 friend_events.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
-                        for (DataSnapshot snapshot : dataSnapshot1.getChildren()) {
-                            for (DataSnapshot snap : snapshot.child("friends").getChildren()) {
-                                String friends = snap.getKey();
-                                if (friends.equals(currentUser)) {
-                                    Log.e(TAG, snapshot.getKey());
-                                    data = String.valueOf(dataSnapshot.child(snapshot.getKey()).getValue());
-                                    if (data.equals("null")) {
-                                    } else {
-                                        userList = getListData(data, userList);
-                                        adapter.notifyDataSetChanged();
+                    public void onDataChange(@NonNull DataSnapshot users_parent) {
+                        for (DataSnapshot users_uid : users_parent.getChildren()) {
+                            for (DataSnapshot users_frnds : users_uid.child("friends").getChildren()) {
+                                if (users_frnds.getKey().equals(currentUser)) {
+                                    for (DataSnapshot events_frnds_num : events_parent.child(users_uid.getKey()).getChildren()){
+                                        data = String.valueOf(events_frnds_num.getValue());
+                                        if (init_flag == 0) {
+                                            userList = getListData(data, new ArrayList<EventItem>());
+                                            init_flag = 1;
+                                        } else{
+                                            userList = getListData(data, userList);
+                                        }
                                     }
+                                    adapter.notifyDataSetChanged();
                                 }
                             }
                         }
@@ -117,7 +121,6 @@ public class EventForumActivity extends AppCompatActivity {
         private LayoutInflater layoutInflater;
         public CustomListAdapter(Context aContext, ArrayList<EventItem> listData) {
             this.listData = listData;
-            Log.e(TAG, String.valueOf(listData));
             layoutInflater = LayoutInflater.from(aContext);
         }
         @Override
