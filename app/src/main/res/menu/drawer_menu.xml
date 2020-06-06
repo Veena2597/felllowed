@@ -3,14 +3,29 @@
     <item android:title="General">
         <menu>
             <item
+                android:id="@+id/home"
+                android:icon="@drawable/ic_home"
+                android:title="Home" />
+
+            <item
+                android:id="@+id/myevents"
+                android:icon="@drawable/ic_events"
+                android:title="My Events" />
+
+            <item
+                android:id="@+id/friends"
+                android:icon="@drawable/ic_friends"
+                android:title="Friends" />
+
+            <item
+                android:id="@+id/notifcations"
+                android:icon="@drawable/ic_notifications"
+                android:title="Notifications" />
+
+            <item
                 android:id="@+id/find_friends"
                 android:icon="@drawable/ic_findfriends"
                 android:title="Find Friends" />
-
-            <item
-                android:id="@+id/about"
-                android:icon="@drawable/ic_about"
-                android:title="About" />
         </menu>
 
     </item>
@@ -21,6 +36,11 @@
                 android:id="@+id/settings"
                 android:icon="@drawable/ic_settings"
                 android:title="Settings" />
+
+            <item
+                android:id="@+id/about"
+                android:icon="@drawable/ic_about"
+                android:title="About" />
 
             <item
                 android:id="@+id/signout"

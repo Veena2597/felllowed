@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.DefaultDatabaseErrorHandler;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class forum extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ForumActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
@@ -72,6 +73,7 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
 
+        //Navigation drawer related parameter
         toolbar = findViewById(R.id.appToolbar);
         setSupportActionBar(toolbar);
 
@@ -84,8 +86,11 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
 
+        //Firebase initialization
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         checkLocationEnabled(locationManager);
         checkPermission();
@@ -117,7 +122,15 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
             }
         }, getMainLooper());
 
+        //Logging the user event forum
         final ListView lv = findViewById(R.id.events);
+
+        if(init_flag == 0){
+            String samdata = "{\"date\":\"6/1/80\",\"des\":\"Same user, multiple events\",\"name\":\"Welcome\",\"time_e\":\"34:12\",\"time_s\":\"12:50\",\"user\":\"Fellowed\"}";
+            userList = getListData(samdata, new ArrayList<EventItem>());
+            init_flag = 1;
+        }
+
         DatabaseReference databaseReference = database.getReference("Events");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -127,6 +140,7 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
                         for (DataSnapshot events_num : events_uid.getChildren()) {
                             data = String.valueOf(events_num.getValue());
                             if (init_flag == 0) {
+                                Log.e(TAG+"0", String.valueOf(userList));
                                 userList = getListData(data, new ArrayList<EventItem>());
                                 init_flag = 1;
                             } else{
@@ -137,10 +151,11 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
                     }
                 }
 
-                final forum.CustomListAdapter adapter = new forum.CustomListAdapter(forum.this, userList);
+                final ForumActivity.CustomListAdapter adapter = new ForumActivity.CustomListAdapter(ForumActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
 
+                //Logging the friends event forum
                 DatabaseReference friend_events = database.getReference("Users");
                 friend_events.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -151,9 +166,11 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
                                     for (DataSnapshot events_frnds_num : events_parent.child(users_uid.getKey()).getChildren()){
                                         data = String.valueOf(events_frnds_num.getValue());
                                         if (init_flag == 0) {
+                                            Log.e(TAG+"0x", String.valueOf(userList));
                                             userList = getListData(data, new ArrayList<EventItem>());
                                             init_flag = 1;
                                         } else{
+                                            Log.e(TAG+"x", String.valueOf(userList));
                                             userList = getListData(data, userList);
                                         }
                                     }
@@ -187,7 +204,7 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
         ArrayList<EventItem> results = arrayList;//new ArrayList<>();
         EventItem user1 = new EventItem();
         Gson gson = new Gson();
-        forum.Event event = gson.fromJson(data, forum.Event.class);
+        ForumActivity.Event event = gson.fromJson(data, ForumActivity.Event.class);
         user1.setEventName(event.name);
         user1.setEventDate(event.date);
         user1.setEventTime(event.time_s);
@@ -236,18 +253,31 @@ public class forum extends AppCompatActivity implements NavigationView.OnNavigat
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         Log.e("forum","nav");
-        if(menuItem.getItemId() == R.id.find_friends){
-            Intent intent = new Intent(forum.this, FindUsersActivity.class);
-            startActivity(intent);
+        Intent intent;
+        switch (menuItem.getItemId()){
+            case R.id.find_friends:
+                intent = new Intent(ForumActivity.this, FindUsersActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.friends:
+                intent = new Intent(ForumActivity.this, FriendsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.notifcations:
+                intent = new Intent(ForumActivity.this, NotificationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.myevents:
+                intent = new Intent(ForumActivity.this, MyEventsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                break;
         }
-
         return false;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.drawer_menu, menu);
-        return true;
     }
 
     @Override

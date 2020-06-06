@@ -27,14 +27,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.lang.reflect.Member;
 
 /** Register activity handles :
-* 1. Checking if user already exists and redirects to MainActivity
-* 2. Create user according to rules set in button.onClickListener
-*    and creates a child under "Users" document in Firebase
-* 3. Handle forgotten password case
-* 4. Redirect to Login activity on login.onClickListener
-*/
+ * 1. Checking if user already exists and redirects to MainActivity
+ * 2. Create user according to rules set in button.onClickListener
+ *    and creates a child under "Users" document in Firebase
+ * 3. Handle forgotten password case
+ * 4. Redirect to Login activity on login.onClickListener
+ */
 
-public class register extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
     public static final String TAG = "TAG";
     static member user;
     EditText mUserName,mEmail,mPassword,mPhone;
@@ -63,7 +63,7 @@ public class register extends AppCompatActivity {
 
         //Check if user already exists and redirects if yes
         if(fAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            startActivity(new Intent(getApplicationContext(),ForumActivity.class));
             finish();
         }
 
@@ -101,7 +101,7 @@ public class register extends AppCompatActivity {
                             fuser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Toast.makeText(register.this, "Verification Email Has been Sent.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, "Verification Email Has been Sent.", Toast.LENGTH_SHORT).show();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -110,7 +110,7 @@ public class register extends AppCompatActivity {
                                 }
                             });
 
-                            Toast.makeText(register.this, "User Created.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
                             userID = fAuth.getCurrentUser().getUid();
 
                             // Write a message to the database
@@ -118,10 +118,10 @@ public class register extends AppCompatActivity {
                             DatabaseReference databaseReference = database.getReference("Users").child(userID);
                             user = new member(userName,email,phone);
                             databaseReference.setValue(user);
-                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                            startActivity(new Intent(getApplicationContext(),ForumActivity.class));
 
                         }else {
-                            Toast.makeText(register.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                         }
                     }
@@ -130,10 +130,10 @@ public class register extends AppCompatActivity {
         });
 
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(getApplicationContext(),login.class));
-                }
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+            }
 
         });
     }

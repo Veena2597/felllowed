@@ -51,7 +51,7 @@ public class AddEventActivity extends AppCompatActivity {
 
                 DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
                 databaseReference.setValue(json);
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                startActivity(new Intent(getApplicationContext(),ForumActivity.class));
                 finish();
             }
         });
