@@ -31,8 +31,8 @@ public class EventForumActivity extends AppCompatActivity {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
     String data;
-    int friend_event_flag = 0;
     ArrayList userList;
+    int init_flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +40,21 @@ public class EventForumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_forum);
 
         final ListView lv = findViewById(R.id.events);
-
         DatabaseReference databaseReference = database.getReference("Events");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                friend_event_flag = 0;
-                data = String.valueOf(dataSnapshot.child(currentUser).getValue());
-                userList = getListData(data, new ArrayList<EventItem>());
-
+                for(DataSnapshot snap : dataSnapshot.getChildren())
+                    if(snap.getKey().equals(currentUser))
+                        for(DataSnapshot snap1 : snap.getChildren()) {
+                            data = String.valueOf(snap1.getValue());
+                            if(init_flag == 0) {
+                                userList = getListData(data, new ArrayList<EventItem>());
+                                init_flag = 1;
+                            }
+                            else
+                                userList = getListData(data, userList);
+                        }
                 final CustomListAdapter adapter = new CustomListAdapter(EventForumActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();

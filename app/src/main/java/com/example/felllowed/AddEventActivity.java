@@ -15,6 +15,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AddEventActivity extends AppCompatActivity {
     final String TAG = "AEA";
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
