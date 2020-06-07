@@ -1,8 +1,11 @@
 package com.example.felllowed;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -11,8 +14,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,17 +31,18 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class MyEventsActivity extends AppCompatActivity {
-
+public class MyEventsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     FirebaseDatabase database;
     String currentUser;
-
-    //Logging the user event forum
     ListView lv;
-
     String data;
     ArrayList userList;
     int init_flag;
+
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    Toolbar toolbar;
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +55,18 @@ public class MyEventsActivity extends AppCompatActivity {
         init_flag = 0;
 
         lv = findViewById(R.id.myevents);
+
+        //Navigation drawer related parameter
+        toolbar = findViewById(R.id.appToolbar);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        actionBarDrawerToggle.syncState();
 
         DatabaseReference databaseReference = database.getReference("Events");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -103,6 +124,36 @@ public class MyEventsActivity extends AppCompatActivity {
         results.add(user1);
 
         return results;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        Log.e("FSU","nav");
+        Intent intent;
+        switch (menuItem.getItemId()){
+            case R.id.home:
+                intent = new Intent(MyEventsActivity.this, ForumActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.find_friends:
+                intent = new Intent(MyEventsActivity.this, FindUsersActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.notifcations:
+                intent = new Intent(MyEventsActivity.this, NotificationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.friends:
+                intent = new Intent(MyEventsActivity.this, FriendsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                break;
+        }
+        return false;
     }
 
     class CustomListAdapter extends BaseAdapter {

@@ -1,12 +1,19 @@
 package com.example.felllowed;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Context;
+import android.content.Intent;
+import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,6 +22,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,11 +33,16 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class NotificationActivity extends AppCompatActivity {
+public class NotificationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ArrayList<String> notifArray;
     private ArrayAdapter adapter;
 
     private ListView notifList;
+
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    Toolbar toolbar;
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +53,18 @@ public class NotificationActivity extends AppCompatActivity {
         notifList = findViewById(R.id.notifList);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notifArray);
         notifList.setAdapter(adapter);
+
+        //Navigation drawer related parameter
+        toolbar = findViewById(R.id.appToolbar);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        actionBarDrawerToggle.syncState();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -88,6 +113,36 @@ public class NotificationActivity extends AppCompatActivity {
         results.add(user1);
 
         return results;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        Log.e("FSU","nav");
+        Intent intent;
+        switch (menuItem.getItemId()){
+            case R.id.home:
+                intent = new Intent(NotificationActivity.this, ForumActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.find_friends:
+                intent = new Intent(NotificationActivity.this, FindUsersActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.myevents:
+                intent = new Intent(NotificationActivity.this, MyEventsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.friends:
+                intent = new Intent(NotificationActivity.this, FriendsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                break;
+        }
+        return false;
     }
 
     class Event{

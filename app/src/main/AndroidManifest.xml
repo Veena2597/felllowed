@@ -23,6 +23,7 @@
         <activity android:name=".MyEventsActivity" />
         <activity android:name=".FriendsActivity" />
         <activity android:name=".NotificationActivity" />
+        <activity android:name=".RequestActivity" />
         <activity android:name=".AddEventActivity"/>
 
         <meta-data

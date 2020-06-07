@@ -7,16 +7,23 @@
     tools:context=".MyEventsActivity"
     android:id="@+id/drawer_layout">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <include
+            android:id="@+id/include2"
+            layout="@layout/nav_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/nav_toolbar" />
+            android:layout_height="wrap_content" />
+
+        <ListView
+            android:id="@+id/myevents"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
