@@ -1,9 +1,12 @@
 package com.example.felllowed;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -67,6 +70,11 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     Dialog addFriend;
     Dialog addedFriend;
 
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    Toolbar toolbar;
+    NavigationView navigationView;
+
     private ArrayList<String> userArray;
     private ArrayList<String> uidArray;
     private ArrayAdapter adapter;
@@ -88,6 +96,18 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLocation();
+
+        //Navigation drawer related parameter
+        toolbar = findViewById(R.id.appToolbar);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        actionBarDrawerToggle.syncState();
 
         //Create new list of users
         userArray = new ArrayList<String>();
@@ -325,8 +345,32 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        Log.e("FSU","nav");
+        Intent intent;
+        switch (menuItem.getItemId()){
+            case R.id.home:
+                intent = new Intent(FindUsersActivity.this, ForumActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.friends:
+                intent = new Intent(FindUsersActivity.this, FriendsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.notifcations:
+                intent = new Intent(FindUsersActivity.this, NotificationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.myevents:
+                intent = new Intent(FindUsersActivity.this, MyEventsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                break;
+        }
         return false;
     }
 }

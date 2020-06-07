@@ -78,9 +78,9 @@
             android:id="@+id/category"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:drawable/btn_dropdown"
             android:layout_marginLeft="40dp"
-            android:spinnerMode="dropdown"/>
+            android:background="@android:drawable/editbox_dropdown_light_frame"
+            android:spinnerMode="dropdown" />
 
     </LinearLayout>
 
@@ -106,9 +106,9 @@
             android:id="@+id/visibility"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:drawable/btn_dropdown"
             android:layout_marginLeft="52dp"
-            android:spinnerMode="dropdown"/>
+            android:background="@android:drawable/editbox_dropdown_light_frame"
+            android:spinnerMode="dropdown" />
 
     </LinearLayout>
 
