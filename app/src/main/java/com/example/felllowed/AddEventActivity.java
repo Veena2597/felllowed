@@ -1,5 +1,6 @@
 package com.example.felllowed;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -23,8 +24,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -45,6 +49,7 @@ public class AddEventActivity extends AppCompatActivity {
     private Spinner spinner;
     private Spinner visibility;
     private DatePickerDialog.OnDateSetListener onDateSetListener;
+    private int init_flag = 0;
     Toolbar toolbar;
 
     @Override
@@ -56,6 +61,8 @@ public class AddEventActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         spinner = findViewById(R.id.category);
+
+        init_flag = 0;
 
         ArrayAdapter<CharSequence> catAdapter = ArrayAdapter.createFromResource(this, R.array.catergory, android.R.layout.simple_spinner_item);
         catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -163,12 +170,26 @@ public class AddEventActivity extends AppCompatActivity {
         event.user = currentUser;
 
         Gson gson = new Gson();
-        String json = gson.toJson(event);
+        final String json = gson.toJson(event);
 
-        DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
-        databaseReference.setValue(json);
-        startActivity(new Intent(getApplicationContext(),ForumActivity.class));
-        finish();
+        final DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(init_flag == 0) {
+                    Map<String, Object> temp = new HashMap<>();
+                    temp.put(String.valueOf((int) dataSnapshot.getChildrenCount() + 1), json);
+                    databaseReference.updateChildren(temp);
+                    startActivity(new Intent(getApplicationContext(), ForumActivity.class));
+                    finish();
+                    init_flag = 1;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
         return true;
     }
 
