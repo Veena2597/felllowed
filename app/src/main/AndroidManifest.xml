@@ -23,7 +23,7 @@
         <activity android:name=".MyEventsActivity" />
         <activity android:name=".FriendsActivity" />
         <activity android:name=".NotificationActivity" />
-        <activity android:name=".AddEventActivity" />
+        <activity android:name=".AddEventActivity" android:theme="@style/AppTheme.NoActionBar"/>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

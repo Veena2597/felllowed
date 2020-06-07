@@ -1,87 +1,236 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddEventActivity">
+    tools:context=".AddEventActivity"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+<!--
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="CREATE NEW EVENT"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="28sp"/> -->
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="336dp"
-        android:layout_height="54dp"
-        android:layout_marginTop="148dp"
-        android:text="Add event"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_end_t" />
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/nav_toolbar" />
 
-    <EditText
-        android:id="@+id/event_name"
-        android:layout_width="330dp"
-        android:layout_height="54dp"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="Event Name"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.308"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/event_date"
-        android:layout_width="329dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="Date"
-        android:inputType="date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.353"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_name" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:fontFamily="sans-serif"
+            android:text="Event Title"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:textSize="18sp" />
 
-    <EditText
-        android:id="@+id/event_start_t"
-        android:layout_width="337dp"
-        android:layout_height="62dp"
-        android:layout_marginStart="26dp"
-        android:layout_marginTop="30dp"
-        android:ems="10"
-        android:hint="Start Time"
-        android:inputType="time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_date" />
+        <EditText
+            android:id="@+id/event_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:hint="Name your event"
+            android:textSize="16sp"
+            android:textAlignment="textStart"
+            android:textColor="#000000"
+            android:fontFamily="sans-serif"/>
 
-    <EditText
-        android:id="@+id/event_end_t"
-        android:layout_width="0dp"
-        android:layout_height="62dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="5dp"
-        android:ems="10"
-        android:hint="End Time"
-        android:inputType="time"
-        app:layout_constraintEnd_toEndOf="@+id/event_start_t"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/button"
-        app:layout_constraintTop_toBottomOf="@+id/event_start_t" />
+    </LinearLayout>
 
-    <EditText
-        android:id="@+id/event_des"
-        android:layout_width="0dp"
-        android:layout_height="53dp"
-        android:layout_marginTop="52dp"
-        android:ems="10"
-        android:gravity="start|top"
-        android:hint="Description"
-        android:inputType="textMultiLine"
-        app:layout_constraintEnd_toEndOf="@+id/button"
-        app:layout_constraintStart_toStartOf="@+id/event_end_t"
-        app:layout_constraintTop_toBottomOf="@+id/event_end_t" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:text="Catergory"
+            android:textSize="18sp"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif"/>
+
+        <Spinner
+            android:id="@+id/category"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginLeft="40dp"
+            android:spinnerMode="dropdown"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:text="Visbility"
+            android:textSize="18sp"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif"/>
+
+        <Spinner
+            android:id="@+id/visibility"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:drawable/btn_dropdown"
+            android:layout_marginLeft="52dp"
+            android:spinnerMode="dropdown"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:text="Date"
+            android:textSize="18sp"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif"/>
+
+        <TextView
+            android:id="@+id/event_date"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:textAlignment="textEnd" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:text="Start Time"
+            android:textSize="18sp"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif"/>
+
+        <TextView
+            android:id="@+id/event_start_t"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:textAlignment="textEnd" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:text="End Time"
+            android:textSize="18sp"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif"/>
+
+        <TextView
+            android:id="@+id/event_end_t"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:textAlignment="textEnd" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:text="Event Description"
+            android:textSize="18sp"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif"/>
+
+        <EditText
+            android:id="@+id/event_des"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:hint="Description"
+            android:textSize="16sp"
+            android:textAlignment="textStart"
+            android:textColor="#000000"
+            android:fontFamily="sans-serif"/>
+    </LinearLayout>
+
+</LinearLayout>

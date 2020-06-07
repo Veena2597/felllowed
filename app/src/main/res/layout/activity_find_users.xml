@@ -11,15 +11,15 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="350dp"
+        android:layout_marginBottom="300dp"
+        android:layout_marginTop="?attr/actionBarSize"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:context=".FindUsersActivity" />
 
     <ListView
         android:id="@+id/userlist"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

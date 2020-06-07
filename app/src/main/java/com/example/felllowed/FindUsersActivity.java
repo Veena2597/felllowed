@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +20,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -52,13 +56,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FindUsersActivity extends FragmentActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
     final String TAG = "FUA";
     public static boolean fromSetting = false;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+    Dialog addFriend;
+    Dialog addedFriend;
 
     private ArrayList<String> userArray;
     private ArrayList<String> uidArray;
@@ -93,6 +100,51 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                addFriend = new Dialog(FindUsersActivity.this);
+                addFriend.setContentView(R.layout.activity_custom_alert);
+
+                addedFriend = new Dialog(FindUsersActivity.this);
+                addedFriend.setContentView(R.layout.activity_custom_dialog);
+
+                Button add = addFriend.findViewById(R.id.add_friend_button);
+                TextView username = addFriend.findViewById(R.id.added_username);
+                username.setText(userArray.get(position));
+
+                TextView username_dialog = addedFriend.findViewById(R.id.added_username);
+                username_dialog.setText(userArray.get(position));
+
+                ImageView cancel = addFriend.findViewById(R.id.cancel_dialog);
+                cancel.setImageDrawable(getDrawable(R.drawable.ic_findfriends));
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addFriend.dismiss();
+                    }
+                });
+
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Map<String, Object> userUpdates = new HashMap<>();
+                        userUpdates.put(uidArray.get(position), userArray.get(position));
+                        myfrndsRef.updateChildren(userUpdates);
+
+                        addFriend.dismiss();
+                        addedFriend.show();
+
+                        final Timer t = new Timer();
+                        t.schedule(new TimerTask() {
+                            public void run() {
+                                addedFriend.dismiss(); // when the task active then close the dialog
+                                t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
+                            }
+                        }, 2000);
+                    }
+                });
+
+                addFriend.show();
+                /*
                 new AlertDialog.Builder(FindUsersActivity.this)
                         .setTitle("Add Friend")
                         .setMessage("Want to add "+userArray.get(position)+" as friend?")
@@ -107,7 +159,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                             }
                         })
                         .setNegativeButton("CANCEL", null)
-                        .show();
+                        .show(); */
             }
         });
     }

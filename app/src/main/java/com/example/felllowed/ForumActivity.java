@@ -36,6 +36,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -66,7 +67,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     private ListView eventList;
     private static final int REQUEST_CODE = 101;
     private double Latitude = 0.0, Longitude = 0.0;
-    public static boolean fromSetting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -289,6 +289,25 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         else{
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        toolbar.inflateMenu(R.menu.options);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener () {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return onOptionsItemSelected(item);
+            }
+        });
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.e(TAG,"add event");
+        Intent intent = new Intent(ForumActivity.this, AddEventActivity.class);
+        startActivity(intent);
+        return true;
     }
 
     class CustomListAdapter extends BaseAdapter {

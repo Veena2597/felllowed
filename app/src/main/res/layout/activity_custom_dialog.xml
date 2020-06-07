@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="250dp"
+    android:layout_height="300dp"
+    android:padding="5dp"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_findfriends"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/added_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp"
+        android:fontFamily="serif-monospace"
+        android:hint="Username"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:fontFamily="serif-monospace"
+        android:hint="Added to Friends"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:textColor="#000000"
+        android:src="@drawable/ic_check_black_24dp" />
+
+</LinearLayout>
