@@ -17,11 +17,7 @@
         android:layout_height="wrap_content"
         layout="@layout/content_main" />
 
-    <include
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/activity_event_forum" />
-<!--
+    <!--
     <ListView
         android:id="@+id/events"
         android:layout_width="match_parent"
@@ -31,6 +27,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/appToolbar"
         app:layout_constraintTop_toTopOf="parent" /> -->
+
+    <include
+        layout="@layout/activity_event_forum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <com.google.android.material.navigation.NavigationView
         android:layout_width="match_parent"

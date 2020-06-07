@@ -189,10 +189,10 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     public void onMapReady(final GoogleMap googleMap) {
         //Set Marker
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("Current User").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("ME").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (float) 15));
-        googleMap.addMarker(markerOptions);
+        googleMap.addMarker(markerOptions).showInfoWindow();
 
         googleMap.addCircle(new CircleOptions()
                 .center(latLng)
@@ -231,16 +231,19 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         //Get user and add marker in map
                         final String user = dataSnapshot.getValue(String.class);
+                        if (!key.equals(currentuser)) {
+                            LatLng latLng = new LatLng(location.latitude, location.longitude);
+                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(user).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+                            googleMap.addMarker(markerOptions);
 
-                        LatLng latLng = new LatLng(location.latitude, location.longitude);
-                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(user);
-                        googleMap.addMarker(markerOptions);
-
-                        //Add user to list
-                        if(user != null) {
-                            userArray.add(user);
-                            uidArray.add(key);
-                            adapter.notifyDataSetChanged();
+                            //Add user to list
+                            if (user != null) {
+                                Log.e("user", user);
+                                Log.e("key", key);
+                                userArray.add(user);
+                                uidArray.add(key);
+                                adapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     @Override
@@ -285,7 +288,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     protected void onResume() {
             super.onResume();
-            Log.e("onResume", "entered here");
             if(fromSetting == true){
                 finish();
                 fromSetting = false;
