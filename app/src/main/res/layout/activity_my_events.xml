@@ -6,4 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MyEventsActivity">
 
+    <ListView
+        android:id="@+id/myevents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

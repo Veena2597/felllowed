@@ -27,6 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -54,16 +56,18 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     NavigationView navigationView;
 
     final String TAG = "forum";
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    FirebaseDatabase database;
+    String currentUser;
+    DataSnapshot events_parent;
     String data;
     ArrayList userList;
+    ArrayList eventList;
     int init_flag = 0;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
 
-    private ListView eventList;
+    //private ListView eventList;
     private static final int REQUEST_CODE = 101;
     private double Latitude = 0.0, Longitude = 0.0;
     public static boolean fromSetting = false;
@@ -80,6 +84,10 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        ImageView navImage = (ImageView) headerView.findViewById(R.id.imageView);
+        //navImage.setImageIcon();
+        TextView navUsername = (TextView) headerView.findViewById(R.id.username_header);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -87,8 +95,9 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         actionBarDrawerToggle.syncState();
 
         //Firebase initialization
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        database = FirebaseDatabase.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        navUsername.setText(currentUser);
 
         //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -116,7 +125,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
 
                         DatabaseReference mygeoRef = database.getReference("LocationGeo");
                         GeoFire geoFire = new GeoFire(mygeoRef);
-                        geoFire.setLocation(currentuser, new GeoLocation(Latitude, Longitude));
+                        geoFire.setLocation(currentUser, new GeoLocation(Latitude, Longitude));
                     }
                 }
             }
@@ -125,68 +134,50 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         //Logging the user event forum
         final ListView lv = findViewById(R.id.events);
 
-        if(init_flag == 0){
-            String samdata = "{\"date\":\"6/1/80\",\"des\":\"Same user, multiple events\",\"name\":\"Welcome\",\"time_e\":\"34:12\",\"time_s\":\"12:50\",\"user\":\"Fellowed\"}";
-            userList = getListData(samdata, new ArrayList<EventItem>());
-            init_flag = 1;
-        }
-
-        DatabaseReference databaseReference = database.getReference("Events");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        //Saving dataSnapshot of Events
+        final DatabaseReference events_Reference = database.getReference("Events");
+        events_Reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull final DataSnapshot events_parent) {
-                for(DataSnapshot events_uid : events_parent.getChildren()) {
-                    if (events_uid.getKey().equals(currentUser)) {
-                        for (DataSnapshot events_num : events_uid.getChildren()) {
-                            data = String.valueOf(events_num.getValue());
-                            if (init_flag == 0) {
-                                Log.e(TAG+"0", String.valueOf(userList));
-                                userList = getListData(data, new ArrayList<EventItem>());
-                                init_flag = 1;
-                            } else{
-                                Log.e(TAG, String.valueOf(userList));
-                                userList = getListData(data, userList);
-                            }
-                        }
-                    }
-                }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                events_parent = dataSnapshot;
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
 
-                final ForumActivity.CustomListAdapter adapter = new ForumActivity.CustomListAdapter(ForumActivity.this, userList);
-                lv.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-
-                //Logging the friends event forum
-                DatabaseReference friend_events = database.getReference("Users");
-                friend_events.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot users_parent) {
-                        for (DataSnapshot users_uid : users_parent.getChildren()) {
-                            for (DataSnapshot users_frnds : users_uid.child("friends").getChildren()) {
-                                if (users_frnds.getKey().equals(currentUser)) {
-                                    for (DataSnapshot events_frnds_num : events_parent.child(users_uid.getKey()).getChildren()){
-                                        data = String.valueOf(events_frnds_num.getValue());
-                                        if (init_flag == 0) {
-                                            Log.e(TAG+"0x", String.valueOf(userList));
-                                            userList = getListData(data, new ArrayList<EventItem>());
-                                            init_flag = 1;
-                                        } else{
-                                            Log.e(TAG+"x", String.valueOf(userList));
-                                            userList = getListData(data, userList);
-                                        }
-                                    }
-                                    adapter.notifyDataSetChanged();
+        //Logging the friends event forum
+        DatabaseReference friend_events = database.getReference("Users");
+        friend_events.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot users_parent) {
+                userList = new ArrayList();
+                eventList = new ArrayList();
+                for (DataSnapshot users_uid : users_parent.getChildren()) {
+                    for (DataSnapshot users_frnds : users_uid.child("friends").getChildren()) {
+                        if (users_frnds.getKey().equals(currentUser)) {
+                            for (DataSnapshot events_frnds_num : events_parent.child(users_uid.getKey()).getChildren()){
+                                eventList.add(events_frnds_num);
+                                data = String.valueOf(events_frnds_num.getValue());
+                                if (init_flag == 0) {
+                                    userList = getListData(data, new ArrayList<EventItem>());
+                                    init_flag = 1;
+                                } else{
+                                    userList = getListData(data, userList);
                                 }
                             }
                         }
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-
+                }
+                if(init_flag == 0){
+                    String samdata = "{\"date\":\"X\",\"des\":\"Please add events to view them here\",\"name\":\"Welcome\",\"time_e\":\"00:00\",\"time_s\":\"00:00\",\"user\":\"Fellowed\"}";
+                    userList = getListData(samdata, new ArrayList<EventItem>());
+                    init_flag = 1;
+                }
+                final ForumActivity.CustomListAdapter adapter = new ForumActivity.CustomListAdapter(ForumActivity.this, userList);
+                lv.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
@@ -195,7 +186,9 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-                EventItem user = (EventItem) lv.getItemAtPosition(position);
+                Intent intent = new Intent(ForumActivity.this, RequestActivity.class);
+                intent.putExtra("event", String.valueOf(eventList.get(position)));
+                startActivity(intent);
             }
         });
     }
@@ -252,7 +245,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Log.e("forum","nav");
         Intent intent;
         switch (menuItem.getItemId()){
             case R.id.find_friends:
@@ -322,23 +314,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             TextView eventTime = v.findViewById(R.id.list_time);
             TextView eventuser = v.findViewById(R.id.list_user);
             final TextView eventdes = v.findViewById(R.id.list_des);
-
-            /*eventName.setText(eventItem.getEventName());
-            eventDate.setText(eventItem.getEventDate());
-            eventTime.setText(eventItem.getEventTime());
-            //eventdes.setText(eventItem.getEventDes());
-            eventdes.setText("Hello. This is Ash. Im just testing\nHow about you? What you upto");
-            eventdes.post(new Runnable() {
-                @Override
-                public void run() {
-                    Log.e("Descount", String.valueOf(eventdes.getLineCount()));
-                    Log.e("Desheight", String.valueOf(eventdes.getLineHeight()));
-                    int height_in_pixels = eventdes.getLineCount() * eventdes.getLineHeight(); //approx height text
-                    eventdes.setHeight(height_in_pixels);
-
-                }
-            });
-            eventuser.setText("Ash");*/
 
             eventName.setText(eventItem.getEventName());
             eventDate.setText(eventItem.getEventDate());
