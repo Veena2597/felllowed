@@ -1,12 +1,16 @@
 package com.example.felllowed;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -52,13 +59,21 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FindUsersActivity extends FragmentActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
     final String TAG = "FUA";
     public static boolean fromSetting = false;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    Dialog addFriend;
+    Dialog addedFriend;
 
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    Toolbar toolbar;
+    NavigationView navigationView;
 
     private ArrayList<String> userArray;
     private ArrayList<String> uidArray;
@@ -82,6 +97,18 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLocation();
 
+        //Navigation drawer related parameter
+        toolbar = findViewById(R.id.appToolbar);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        actionBarDrawerToggle.syncState();
+
         //Create new list of users
         userArray = new ArrayList<String>();
         uidArray = new ArrayList<String>();
@@ -93,6 +120,51 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                addFriend = new Dialog(FindUsersActivity.this);
+                addFriend.setContentView(R.layout.activity_custom_alert);
+
+                addedFriend = new Dialog(FindUsersActivity.this);
+                addedFriend.setContentView(R.layout.activity_custom_dialog);
+
+                Button add = addFriend.findViewById(R.id.add_friend_button);
+                TextView username = addFriend.findViewById(R.id.added_username);
+                username.setText(userArray.get(position));
+
+                TextView username_dialog = addedFriend.findViewById(R.id.added_username);
+                username_dialog.setText(userArray.get(position));
+
+                ImageView cancel = addFriend.findViewById(R.id.cancel_dialog);
+                cancel.setImageDrawable(getDrawable(R.drawable.ic_findfriends));
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addFriend.dismiss();
+                    }
+                });
+
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Map<String, Object> userUpdates = new HashMap<>();
+                        userUpdates.put(uidArray.get(position), userArray.get(position));
+                        myfrndsRef.updateChildren(userUpdates);
+
+                        addFriend.dismiss();
+                        addedFriend.show();
+
+                        final Timer t = new Timer();
+                        t.schedule(new TimerTask() {
+                            public void run() {
+                                addedFriend.dismiss(); // when the task active then close the dialog
+                                t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
+                            }
+                        }, 2000);
+                    }
+                });
+
+                addFriend.show();
+                /*
                 new AlertDialog.Builder(FindUsersActivity.this)
                         .setTitle("Add Friend")
                         .setMessage("Want to add "+userArray.get(position)+" as friend?")
@@ -107,7 +179,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                             }
                         })
                         .setNegativeButton("CANCEL", null)
-                        .show();
+                        .show(); */
             }
         });
     }
@@ -275,8 +347,32 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        Log.e("FSU","nav");
+        Intent intent;
+        switch (menuItem.getItemId()){
+            case R.id.home:
+                intent = new Intent(FindUsersActivity.this, ForumActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.friends:
+                intent = new Intent(FindUsersActivity.this, FriendsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.notifcations:
+                intent = new Intent(FindUsersActivity.this, NotificationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.myevents:
+                intent = new Intent(FindUsersActivity.this, MyEventsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                break;
+        }
         return false;
     }
 }

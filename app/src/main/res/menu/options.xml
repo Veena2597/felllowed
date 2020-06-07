@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-        <item
-            android:id="@+id/logout"
-            android:title="Sign Out"
-            />
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<item
+    android:id="@+id/satellite"
+    android:icon="@drawable/ic_events"
+    app:showAsAction="ifRoom"
+    android:title="NEW EVENT" />
 </menu>
