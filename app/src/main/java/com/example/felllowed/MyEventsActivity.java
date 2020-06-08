@@ -72,17 +72,15 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull final DataSnapshot myEvents) {
-                if(userList != null)
-                    userList.clear();
+                userList = new ArrayList();
                 for(DataSnapshot my_events: myEvents.child(currentUser+"/events/personal").getChildren()){
-
+                    Log.e("rer",my_events.getValue().toString());
                     Event event = new Event();
                     event.date = my_events.child("date").getValue().toString();
                     event.des = my_events.child("des").getValue().toString();
                     event.name = my_events.child("eventname").getValue().toString();
                     event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
                     event.time_s = my_events.child("time_S").getValue().toString();
-                    //Log.e(TAG, myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString());
 
                     userList.add(event);
                 }
@@ -93,11 +91,15 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
                     event.name = my_events.child("eventname").getValue().toString();
                     event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
                     event.time_s = my_events.child("time_S").getValue().toString();
-                    //Log.e(TAG, myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString());
 
+                    Log.e("MEA2",event.name);
+                    Log.e("MEA2",event.date);
+                    Log.e("MEA2",event.des);
+                    Log.e("MEA2",event.time_s);
+                    Log.e("ME2A",event.user);
                     userList.add(event);
                 }
-                
+                if(true){}
                 final MyEventsActivity.CustomListAdapter adapter = new MyEventsActivity.CustomListAdapter(MyEventsActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -111,7 +113,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-                EventItem user = (EventItem) lv.getItemAtPosition(position);
+                //Intent intent = new Intent(MyEventsActivity.);
             }
         });
     }
@@ -169,7 +171,8 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             if (v == null) {
                 v = layoutInflater.inflate(R.layout.list_row, null);
             }
-            EventItem eventItem = (EventItem) getItem(position);
+            //EventItem eventItem = (EventItem) getItem(position);
+            Event eventItem = (Event) getItem(position);
 
             TextView eventName = v.findViewById(R.id.list_name);
             TextView eventDate = v.findViewById(R.id.list_date);
@@ -177,7 +180,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             TextView eventuser = v.findViewById(R.id.list_user);
             final TextView eventdes = v.findViewById(R.id.list_des);
 
-            eventName.setText(eventItem.getEventName());
+            eventName.setText(eventItem.getname());
             eventDate.setText(eventItem.getEventDate());
             eventTime.setText(eventItem.getEventTime());
             eventdes.setText(eventItem.getEventDes());

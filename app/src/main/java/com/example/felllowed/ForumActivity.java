@@ -62,6 +62,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     String data;
     ArrayList userList;
     ArrayList eventList;
+    TextView navUsername;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
@@ -86,7 +87,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         View headerView = navigationView.getHeaderView(0);
         ImageView navImage = (ImageView) headerView.findViewById(R.id.imageView);
         //navImage.setImageIcon();
-        final TextView navUsername = (TextView) headerView.findViewById(R.id.username_header);
+        navUsername = headerView.findViewById(R.id.username_header);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -148,7 +149,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                         event.name = friend_events.child("eventname").getValue().toString();
                         event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
                         event.time_s = friend_events.child("time_S").getValue().toString();
-                        Log.e(TAG, users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
 
                         userList.add(event);
                     }
@@ -159,7 +159,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                         event.name = friend_events.child("eventname").getValue().toString();
                         event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
                         event.time_s = friend_events.child("time_S").getValue().toString();
-                        Log.e(TAG, users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
 
                         userList.add(event);
                     }

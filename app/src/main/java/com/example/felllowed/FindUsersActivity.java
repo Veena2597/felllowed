@@ -209,7 +209,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onKeyEntered(final String key, final GeoLocation location) {
                 //Get Username from database
-                DatabaseReference myRef = database.getReference("Users").child(key).child("user");
+                DatabaseReference myRef = database.getReference("Users").child(key).child("username");
                 myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
