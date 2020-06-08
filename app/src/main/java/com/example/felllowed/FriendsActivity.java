@@ -44,6 +44,7 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
     ArrayList friends;
     ArrayList profiles;
     private FirebaseDatabase database;
+    ForumActivity.UserData userdata;
     String currentUser;
     String frndname;
     String frnduid;
@@ -68,12 +69,14 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
 
         gridView = findViewById(R.id.friends_grid);
 
+        Intent mydata = getIntent();
+        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
+        Log.e("FA", String.valueOf(userdata.getFriendslist()));
+
         //Firebase initialization
         storageReference = FirebaseStorage.getInstance().getReference("Profiles");
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-
     }
 
     private class CustomGridAdapter extends BaseAdapter{

@@ -72,8 +72,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull final DataSnapshot myEvents) {
-                if(userList != null)
-                    userList.clear();
+                userList = new ArrayList();
                 for(DataSnapshot my_events: myEvents.child(currentUser+"/events/personal").getChildren()){
 
                     Event event = new Event();
