@@ -8,19 +8,32 @@
     tools:context=".FriendsActivity"
     android:id="@+id/drawer_layout">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <include
+            android:id="@+id/include3"
+            layout="@layout/nav_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/nav_toolbar" />
+            android:layout_height="wrap_content" />
+
+        <GridView
+            android:layout_below="@id/include3"
+            android:id="@+id/friends_grid"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="10dp"
+            android:numColumns="2"
+            android:verticalSpacing="10dp"
+             />
+
+    </RelativeLayout>
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
     android:layout_width="match_parent"

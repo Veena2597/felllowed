@@ -64,6 +64,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     ArrayList userList;
     ArrayList eventList;
     int init_flag = 0;
+    UserData userData = new UserData();;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
@@ -97,6 +98,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         //Firebase initialization
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        userData.setUid(currentUser);
 
         //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -152,8 +154,9 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             public void onDataChange(@NonNull DataSnapshot users_parent) {
                 userList = new ArrayList();
                 eventList = new ArrayList();
-
-                navUsername.setText(String.valueOf(users_parent.child(currentUser).child("username").getValue()));
+                String name = String.valueOf(users_parent.child(currentUser).child("username").getValue());
+                userData.setUsername(name);
+                navUsername.setText(name);
                 for (DataSnapshot users_uid : users_parent.getChildren()) {
                     for (DataSnapshot users_frnds : users_uid.child("friends").getChildren()) {
                         if (users_frnds.getKey().equals(currentUser)) {
@@ -250,22 +253,27 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             case R.id.find_friends:
                 intent = new Intent(ForumActivity.this, FindUsersActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.friends:
                 intent = new Intent(ForumActivity.this, FriendsActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.notifcations:
                 intent = new Intent(ForumActivity.this, NotificationActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.myevents:
                 intent = new Intent(ForumActivity.this, MyEventsActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.signout:
                 intent = new Intent(ForumActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             default:
                 if(drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -359,6 +367,36 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         private String time_e;
         private String des;
         private String user;
+    }
+
+    static class UserData{
+        public String username;
+        public String uid;
+        public ArrayList friendslist;
+
+        public ArrayList getFriendslist() {
+            return friendslist;
+        }
+
+        public String getUid() {
+            return uid;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setFriendslist(ArrayList friendslist) {
+            this.friendslist = friendslist;
+        }
+
+        public void setUid(String uid) {
+            this.uid = uid;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
     }
 }
 

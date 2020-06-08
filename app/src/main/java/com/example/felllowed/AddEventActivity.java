@@ -171,25 +171,25 @@ public class AddEventActivity extends AppCompatActivity {
 
         Gson gson = new Gson();
         final String json = gson.toJson(event);
-
-        final DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(init_flag == 0) {
-                    Map<String, Object> temp = new HashMap<>();
-                    temp.put(String.valueOf((int) dataSnapshot.getChildrenCount() + 1), json);
-                    databaseReference.updateChildren(temp);
-                    startActivity(new Intent(getApplicationContext(), ForumActivity.class));
-                    finish();
-                    init_flag = 1;
+        if(item.getItemId() == R.id.save){
+            final DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(init_flag == 0) {
+                        Map<String, Object> temp = new HashMap<>();
+                        temp.put(String.valueOf((int) dataSnapshot.getChildrenCount() + 1), json);
+                        databaseReference.updateChildren(temp);
+                        startActivity(new Intent(getApplicationContext(), ForumActivity.class));
+                        finish();
+                        init_flag = 1;
+                    }
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        }
         return true;
     }
 

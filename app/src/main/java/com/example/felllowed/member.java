@@ -47,8 +47,6 @@ public class member {
         this.password = password;
     }
     public void updateFriendsList(String username){
-        System.out.println(username);
         friends.add(username);
-        //numFriends++;
     }
 }
