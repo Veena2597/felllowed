@@ -68,65 +68,50 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
         actionBarDrawerToggle.syncState();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        DatabaseReference eventsDatabase = database.getReference("Events");
-        eventsDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                eventDataSnap = dataSnapshot;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        DatabaseReference databaseReference = database.getReference("Users").child(currentUser);
+        DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot user_snapshot) {
-                if (user_snapshot.child("notif_join").exists()) {
-                    for (DataSnapshot events_snap : user_snapshot.child("notif_join").getChildren()) {
-                        for (DataSnapshot requestor_snap : events_snap.getChildren()) {
-                            notifArray.add(requestor_snap.getKey() +
-                                    " has requested to join event");
+            public void onDataChange(@NonNull DataSnapshot events_snap) {
+                for(DataSnapshot public_event : events_snap.child(currentUser+"/events").child("public").getChildren()){
+                    for(DataSnapshot joins : public_event.child("join").getChildren()){
+                        if(joins.getValue().toString().equals("0")){
+                            notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
+                            " has asked to join event: "+
+                                    public_event.child("eventname").getValue().toString());
                         }
                     }
-                }
-                if (user_snapshot.child("notif_req").exists()) {
-                    for (DataSnapshot events_snap : user_snapshot.child("notif_req").getChildren()) {
-                        for (DataSnapshot requestor_snap : events_snap.getChildren()) {
-                            notifArray.add(requestor_snap.getKey() +
-                                    " has requested for event");
-                        }
+                    for(DataSnapshot joins : public_event.child("req").getChildren()){
+                        //if(joins.getValue().toString().equals("0")){
+                            notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
+                                    " has requested for event: "+
+                                    public_event.child("eventname").getValue().toString());
+                        //}
                     }
                 }
+                for(DataSnapshot personal_event : events_snap.child(currentUser+"/events").child("personal").getChildren()){
+                    for(DataSnapshot joins : personal_event.child("join").getChildren()){
+                        if(joins.getValue().toString().equals("0")){
+                            notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
+                                    " has asked to join event: "+
+                                    personal_event.child("eventname").getValue().toString());
+                        }
+                    }
+                    for(DataSnapshot joins : personal_event.child("req").getChildren()){
+                        notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
+                                " has requested for event: "+
+                                personal_event.child("eventname").getValue().toString());
+                    }
+                }
+
                 adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-    }
-
-    private ArrayList getListData(String data, ArrayList<EventItem> arrayList) {
-        ArrayList<EventItem> results = arrayList;//new ArrayList<>();
-        EventItem user1 = new EventItem();
-        Gson gson = new Gson();
-        //MyEventsActivity.Event event = gson.fromJson(data, MyEventsActivity.Event.class);
-        Event event = gson.fromJson(data, Event.class);
-        user1.setEventName(event.name);
-        user1.setEventDate(event.date);
-        user1.setEventTime(event.time_s);
-        user1.setEventDes(event.des);
-        user1.setUserName(event.user);
-        results.add(user1);
-
-        return results;
     }
 
     @Override
@@ -158,12 +143,4 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
         return false;
     }
 
-    class Event{
-        private String name;
-        private String date;
-        private String time_s;
-        private String time_e;
-        private String des;
-        private String user;
-    }
 }

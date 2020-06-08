@@ -35,9 +35,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
     FirebaseDatabase database;
     String currentUser;
     ListView lv;
-    String data;
     ArrayList userList;
-    int init_flag;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -51,8 +49,6 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
 
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        init_flag = 0;
 
         lv = findViewById(R.id.myevents);
 
