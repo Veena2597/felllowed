@@ -19,30 +19,31 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".RewardsActivity"></activity>
-        <activity android:name=".ForumActivity" />
+        <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".MyEventsActivity" />
-        <activity android:name=".FriendsActivity" />
-        <activity android:name=".NotificationActivity" />
+        <activity android:name=".FriendsActivity" >
+
+        </activity>
+        <activity android:name=".NotificationActivity">
+
+        </activity>
         <activity android:name=".RequestActivity" />
-        <activity android:name=".AddEventActivity" />
+        <activity android:name=".AddEventActivity"/>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyB6FjReMHMhN90qFfChEO7XKJol6_5CzKg" />
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".RegisterActivity" android:theme="@style/AppTheme">
+        <activity android:name=".ForumActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FindUsersActivity" />
-        <activity android:name=".LoginActivity" android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".FindUsersActivity"/>
+        <activity android:name=".LoginActivity" >
+        </activity>
     </application>
 
 </manifest>

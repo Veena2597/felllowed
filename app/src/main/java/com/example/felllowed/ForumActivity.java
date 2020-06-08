@@ -48,9 +48,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ForumActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ForumActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Serializable {
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
@@ -252,6 +253,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         switch (menuItem.getItemId()){
             case R.id.find_friends:
                 intent = new Intent(ForumActivity.this, FindUsersActivity.class);
+                intent.putExtra("userdata", userData);
                 startActivity(intent);
                 finish();
                 break;
