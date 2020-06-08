@@ -3,13 +3,17 @@ package com.example.felllowed;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +27,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.lang.reflect.Member;
 
@@ -36,13 +43,17 @@ import java.lang.reflect.Member;
 
 public class RegisterActivity extends AppCompatActivity {
     public static final String TAG = "TAG";
+    public static final int PICK_IMAGE_REQUEST = 1;
     static member user;
     EditText mUserName,mEmail,mPassword,mPhone;
     Button mRegisterBtn;
     TextView mLoginBtn;
     FirebaseAuth fAuth;
     ProgressBar progressBar;
+    ImageView mProfile;
     String userID;
+    StorageReference storageReference;
+    String profileFile;
 
 
     @Override
@@ -57,15 +68,28 @@ public class RegisterActivity extends AppCompatActivity {
         mPhone      = findViewById(R.id.phone);
         mRegisterBtn= findViewById(R.id.registerBtn);
         mLoginBtn   = findViewById(R.id.createText);
+        mProfile = findViewById(R.id.profile);
 
         fAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
+        storageReference = FirebaseStorage.getInstance().getReference("Profiles");
 
         //Check if user already exists and redirects if yes
         if(fAuth.getCurrentUser() != null){
             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
             finish();
         }
+
+        mProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                finish();
+            }
+        });
 
         mRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,8 +140,10 @@ public class RegisterActivity extends AppCompatActivity {
                             // Write a message to the database
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference databaseReference = database.getReference("Users").child(userID);
+                            DatabaseReference profileReference = database.getReference("Profiles").child(userID);
                             user = new member(userName,email,phone);
                             databaseReference.setValue(user);
+                            profileReference.setValue(profileFile);
                             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
 
                         }else {
@@ -136,6 +162,44 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    private void uploadProfile(Uri profileImage){
+        if(profileImage != null){
+            StorageReference fileReference = storageReference.child(userID+'.'+getFileExtension(profileImage));
+            fileReference.putFile(profileImage);
+
+            profileFile = userID+'.'+getFileExtension(profileImage);
+
+            fileReference.putFile(profileImage)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "profile not uploaded");
+                        }
+                    });
+        }
+    }
+
+    private String getFileExtension(Uri uri){
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null){
+            uploadProfile(data.getData());
+        }
     }
 }
 

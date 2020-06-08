@@ -9,6 +9,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,8 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -27,6 +28,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -36,10 +40,15 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
-
-    ListView listView;
-    ArrayList friendList;
-
+    GridView gridView;
+    ArrayList friends;
+    ArrayList profiles;
+    private FirebaseDatabase database;
+    ForumActivity.UserData userdata;
+    String currentUser;
+    String frndname;
+    String frnduid;
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,49 +67,40 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
 
-        listView = findViewById(R.id.myfriends);
-        friendList = new ArrayList();
-        CustomListAdapter adapter = new CustomListAdapter(this, friendList);
-        listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        gridView = findViewById(R.id.friends_grid);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("friends");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    friendList.add(snapshot.getValue());
-                }
-            }
+        Intent mydata = getIntent();
+        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
+        Log.e("FA", String.valueOf(userdata.getFriendslist()));
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-        adapter.notifyDataSetChanged();
+        //Firebase initialization
+        storageReference = FirebaseStorage.getInstance().getReference("Profiles");
+        database = FirebaseDatabase.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
-    class CustomListAdapter extends BaseAdapter{
-        private ArrayList<EventItem> listData;
+    private class CustomGridAdapter extends BaseAdapter{
+        private ArrayList<FriendItem> listData;
         private LayoutInflater layoutInflater;
-        public CustomListAdapter(Context aContext, ArrayList<EventItem> listData) {
+
+        public CustomGridAdapter(Context aContext, ArrayList<FriendItem> listData) {
             this.listData = listData;
             layoutInflater = LayoutInflater.from(aContext);
         }
+
         @Override
         public int getCount() {
-            return 0;
+            return listData.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return null;
+            return listData.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
 
         @Override
@@ -108,23 +108,44 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.list_friends, null);
             }
+            FriendItem friendItem = (FriendItem) getItem(position);
 
-            FriendInfo friendInfo = (FriendInfo)getItem(position);
-            TextView friend_name = convertView.findViewById(R.id.friend_name);
-            ImageView friend_profile = convertView.findViewById(R.id.friend_profile);
+            TextView name = convertView.findViewById(R.id.friend_name);
+            ImageView picture = convertView.findViewById(R.id.friend_pic);
 
-            friend_name.setText(friendInfo.getFriendName());
-            friend_profile.setImageResource(R.drawable.common_full_open_on_phone);
+            name.setText(friendItem.getName());
 
-            convertView.setTag(friendInfo);
+
+            convertView.setTag(friendItem);
             return convertView;
+
         }
     }
-    class FriendInfo{
-        private String name;
-        public String getFriendName() {
+
+    private class FriendItem{
+        String pictureUrl;
+        String name;
+
+        public String getPicture() {
+            return pictureUrl;
+        }
+
+        public void setPicture(String pictureUrl) {
+            this.pictureUrl = pictureUrl;
+        }
+
+        public String getName() {
             return name;
         }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    private class friendData{
+        private Uri picture;
+        private String name;
     }
 
     @Override
@@ -135,18 +156,22 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
             case R.id.home:
                 intent = new Intent(FriendsActivity.this, ForumActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.find_friends:
                 intent = new Intent(FriendsActivity.this, FindUsersActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.notifcations:
                 intent = new Intent(FriendsActivity.this, NotificationActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.myevents:
                 intent = new Intent(FriendsActivity.this, MyEventsActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             default:
                 if(drawerLayout.isDrawerOpen(GravityCompat.START)){
