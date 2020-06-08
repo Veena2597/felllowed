@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:title="General">
         <menu>
             <item
@@ -26,6 +27,11 @@
                 android:id="@+id/find_friends"
                 android:icon="@drawable/ic_findfriends"
                 android:title="Find Friends" />
+
+            <item
+                android:id="@+id/rewards"
+                android:icon="@drawable/ic_coins"
+                android:title="My Rewards" />
         </menu>
 
     </item>
@@ -46,6 +52,7 @@
                 android:id="@+id/signout"
                 android:icon="@drawable/ic_signout"
                 android:title="Sign Out" />
+
         </menu>
     </item>
 

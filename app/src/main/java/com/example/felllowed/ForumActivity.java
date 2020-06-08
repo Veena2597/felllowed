@@ -87,7 +87,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         View headerView = navigationView.getHeaderView(0);
         ImageView navImage = (ImageView) headerView.findViewById(R.id.imageView);
         //navImage.setImageIcon();
-        TextView navUsername = (TextView) headerView.findViewById(R.id.username_header);
+        final TextView navUsername = (TextView) headerView.findViewById(R.id.username_header);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -97,7 +97,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         //Firebase initialization
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        navUsername.setText(currentUser);
 
         //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -153,6 +152,8 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             public void onDataChange(@NonNull DataSnapshot users_parent) {
                 userList = new ArrayList();
                 eventList = new ArrayList();
+
+                navUsername.setText(String.valueOf(users_parent.child(currentUser).child("username").getValue()));
                 for (DataSnapshot users_uid : users_parent.getChildren()) {
                     for (DataSnapshot users_frnds : users_uid.child("friends").getChildren()) {
                         if (users_frnds.getKey().equals(currentUser)) {
@@ -217,7 +218,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         user1.setEventDes(event.des);
         user1.setUserName(event.user);
         results.add(user1);
-
         return results;
     }
 
@@ -274,6 +274,10 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 break;
             case R.id.myevents:
                 intent = new Intent(ForumActivity.this, MyEventsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.signout:
+                intent = new Intent(ForumActivity.this, LoginActivity.class);
                 startActivity(intent);
                 break;
             default:
@@ -344,7 +348,10 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             TextView eventDate = v.findViewById(R.id.list_date);
             TextView eventTime = v.findViewById(R.id.list_time);
             TextView eventuser = v.findViewById(R.id.list_user);
-            final TextView eventdes = v.findViewById(R.id.list_des);
+            TextView eventdes = v.findViewById(R.id.list_des);
+
+            ImageView profilepic = v.findViewById(R.id.profile_pic);
+            profilepic.setImageResource(R.drawable.logo_1_launcher);
 
             eventName.setText(eventItem.getEventName());
             eventDate.setText(eventItem.getEventDate());
