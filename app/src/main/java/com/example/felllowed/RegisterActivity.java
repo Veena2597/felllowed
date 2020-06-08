@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -30,7 +32,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.lang.reflect.Member;
 
 /** Register activity handles :
@@ -43,7 +47,7 @@ import java.lang.reflect.Member;
 
 public class RegisterActivity extends AppCompatActivity {
     public static final String TAG = "TAG";
-    public static final int PICK_IMAGE_REQUEST = 1;
+    public static final int PICK_IMAGE_REQUEST = 1000;
     static member user;
     EditText mUserName,mEmail,mPassword,mPhone;
     Button mRegisterBtn;
@@ -53,14 +57,17 @@ public class RegisterActivity extends AppCompatActivity {
     ImageView mProfile;
     String userID;
     StorageReference storageReference;
-    String profileFile;
-
+    FirebaseDatabase database;
+    DatabaseReference databaseReference;
+    DatabaseReference profileReference;
+    Uri profileFile;
+    String profileref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
 
         mUserName   = findViewById(R.id.fullName);
         mEmail      = findViewById(R.id.Email);
@@ -72,22 +79,27 @@ public class RegisterActivity extends AppCompatActivity {
 
         fAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
-        storageReference = FirebaseStorage.getInstance().getReference("Profiles");
+
+
+        // Write a message to the database
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
+        database = FirebaseDatabase.getInstance();
+
 
         //Check if user already exists and redirects if yes
+        /*
         if(fAuth.getCurrentUser() != null){
             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
             finish();
-        }
+        }*/
 
         mProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Log.e("RA", "hello1");
                 startActivityForResult(intent, PICK_IMAGE_REQUEST);
-                finish();
+                //finish();
             }
         });
 
@@ -134,16 +146,16 @@ public class RegisterActivity extends AppCompatActivity {
                                 }
                             });
 
-                            Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
                             userID = fAuth.getCurrentUser().getUid();
+                            databaseReference = database.getReference("Users").child(userID);
+                            profileReference = database.getReference("Profiles").child(userID);
+                            uploadProfile(profileFile);
 
-                            // Write a message to the database
-                            FirebaseDatabase database = FirebaseDatabase.getInstance();
-                            DatabaseReference databaseReference = database.getReference("Users").child(userID);
-                            DatabaseReference profileReference = database.getReference("Profiles").child(userID);
+                            Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
+
                             user = new member(userName,email,phone);
                             databaseReference.setValue(user);
-                            profileReference.setValue(profileFile);
+                            profileReference.setValue(profileref);
                             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
 
                         }else {
@@ -166,16 +178,18 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void uploadProfile(Uri profileImage){
         if(profileImage != null){
-            StorageReference fileReference = storageReference.child(userID+'.'+getFileExtension(profileImage));
-            fileReference.putFile(profileImage);
+            Log.e("FA", String.valueOf(profileImage));
+            StorageReference fileReference = storageReference.child(userID+ getFileExtension(profileImage));
 
-            profileFile = userID+'.'+getFileExtension(profileImage);
+            profileref = userID+'.'+ getFileExtension(profileImage);
+            Log.e("RA",userID+ getFileExtension(profileImage));
+            fileReference.putFile(profileImage);
 
             fileReference.putFile(profileImage)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
+                            //Picasso.
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -194,11 +208,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null){
-            uploadProfile(data.getData());
+            profileFile = data.getData();
+            mProfile.setImageURI(profileFile);
         }
     }
 }

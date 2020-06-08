@@ -32,14 +32,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FriendsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class FriendsActivity extends ForumActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    Toolbar toolbar;
-    NavigationView navigationView;
     GridView gridView;
     ArrayList friends;
     ArrayList profiles;
@@ -54,18 +51,6 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-
-        //Navigation drawer related parameter
-        toolbar = findViewById(R.id.appToolbar);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
 
         gridView = findViewById(R.id.friends_grid);
 
@@ -115,7 +100,6 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
 
             name.setText(friendItem.getName());
 
-
             convertView.setTag(friendItem);
             return convertView;
 
@@ -146,39 +130,5 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
     private class friendData{
         private Uri picture;
         private String name;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Log.e("FSU","nav");
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.home:
-                intent = new Intent(FriendsActivity.this, ForumActivity.class);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.find_friends:
-                intent = new Intent(FriendsActivity.this, FindUsersActivity.class);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.notifcations:
-                intent = new Intent(FriendsActivity.this, NotificationActivity.class);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.myevents:
-                intent = new Intent(FriendsActivity.this, MyEventsActivity.class);
-                startActivity(intent);
-                finish();
-                break;
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
     }
 }

@@ -56,6 +56,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,6 +75,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
+    ForumActivity.UserData userdata;
 
     private ArrayList<String> userArray;
     private ArrayList<String> uidArray;
@@ -108,6 +110,9 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+
+        Intent mydata = getIntent();
+        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         //Create new list of users
         userArray = new ArrayList<String>();
@@ -337,18 +342,22 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         switch (menuItem.getItemId()){
             case R.id.home:
                 intent = new Intent(FindUsersActivity.this, ForumActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             case R.id.friends:
                 intent = new Intent(FindUsersActivity.this, FriendsActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             case R.id.notifcations:
                 intent = new Intent(FindUsersActivity.this, NotificationActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             case R.id.myevents:
                 intent = new Intent(FindUsersActivity.this, MyEventsActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             default:

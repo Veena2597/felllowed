@@ -44,6 +44,7 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
     Toolbar toolbar;
     NavigationView navigationView;
     DataSnapshot eventDataSnap;
+    ForumActivity.UserData userdata;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,9 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+
+        Intent mydata = getIntent();
+        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -135,18 +139,22 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
         switch (menuItem.getItemId()){
             case R.id.home:
                 intent = new Intent(NotificationActivity.this, ForumActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             case R.id.find_friends:
                 intent = new Intent(NotificationActivity.this, FindUsersActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             case R.id.myevents:
                 intent = new Intent(NotificationActivity.this, MyEventsActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             case R.id.friends:
                 intent = new Intent(NotificationActivity.this, FriendsActivity.class);
+                intent.putExtra("userdata", userdata);
                 startActivity(intent);
                 break;
             default:

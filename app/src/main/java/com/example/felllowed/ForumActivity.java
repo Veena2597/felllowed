@@ -55,7 +55,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
-    NavigationView navigationView;
+    static NavigationView navigationView;
 
     final String TAG = "forum";
     FirebaseDatabase database;
@@ -80,7 +80,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
-        //Where's waldo?
+
         //Navigation drawer related parameter
         toolbar = findViewById(R.id.appToolbar);
         setSupportActionBar(toolbar);
@@ -180,7 +180,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
 
-                Log.e(TAG, String.valueOf((userFriendsList)));
+                //Log.e(TAG, String.valueOf((userFriendsList)));
                 userData.setFriendslist(userFriendsList);
                 userData.setFriendslist(userFriendsUidList);
             }
@@ -253,19 +253,19 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 break;
             case R.id.notifcations:
                 intent = new Intent(ForumActivity.this, NotificationActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
+                intent.putExtra("userdata", userData);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.myevents:
                 intent = new Intent(ForumActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
+                intent.putExtra("userdata", userData);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.signout:
                 intent = new Intent(ForumActivity.this, LoginActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
+                intent.putExtra("userdata", userData);
                 startActivity(intent);
                 finish();
                 break;

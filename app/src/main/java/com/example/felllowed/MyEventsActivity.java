@@ -29,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class MyEventsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -37,6 +38,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
     ListView lv;
     String data;
     ArrayList userList;
+    ForumActivity.UserData userdata;
     int init_flag;
 
     DrawerLayout drawerLayout;
@@ -60,13 +62,15 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         toolbar = findViewById(R.id.appToolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        ForumActivity.navigationView.setNavigationItemSelectedListener(this);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+
+        Intent mydata = getIntent();
+        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -121,18 +125,22 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         switch (menuItem.getItemId()){
             case R.id.home:
                 intent = new Intent(MyEventsActivity.this, ForumActivity.class);
+                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             case R.id.find_friends:
                 intent = new Intent(MyEventsActivity.this, FindUsersActivity.class);
+                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             case R.id.notifcations:
                 intent = new Intent(MyEventsActivity.this, NotificationActivity.class);
+                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             case R.id.friends:
                 intent = new Intent(MyEventsActivity.this, FriendsActivity.class);
+                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             default:
