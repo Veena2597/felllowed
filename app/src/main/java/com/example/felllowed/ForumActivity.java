@@ -78,7 +78,8 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
-        //Where's waldo?
+
+        //Veeeeennnnaaaaaa
         //Navigation drawer related parameter
         toolbar = findViewById(R.id.appToolbar);
         setSupportActionBar(toolbar);
