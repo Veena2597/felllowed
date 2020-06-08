@@ -74,26 +74,26 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             public void onDataChange(@NonNull final DataSnapshot myEvents) {
                 if(userList != null)
                     userList.clear();
-                for(DataSnapshot friend_events: myEvents.child(currentUser+"/events/personal").getChildren()){
+                for(DataSnapshot my_events: myEvents.child(currentUser+"/events/personal").getChildren()){
 
                     Event event = new Event();
-                    event.date = friend_events.child("date").getValue().toString();
-                    event.des = friend_events.child("des").getValue().toString();
-                    event.name = friend_events.child("eventname").getValue().toString();
-                    event.user = myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
-                    event.time_s = friend_events.child("time_S").getValue().toString();
-                    //Log.e(TAG, myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
+                    event.date = my_events.child("date").getValue().toString();
+                    event.des = my_events.child("des").getValue().toString();
+                    event.name = my_events.child("eventname").getValue().toString();
+                    event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
+                    event.time_s = my_events.child("time_S").getValue().toString();
+                    //Log.e(TAG, myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString());
 
                     userList.add(event);
                 }
-                for(DataSnapshot friend_events: myEvents.child(currentUser+"/events/public").getChildren()){
+                for(DataSnapshot my_events: myEvents.child(currentUser+"/events/public").getChildren()){
                     Event event = new Event();
-                    event.date = friend_events.child("date").getValue().toString();
-                    event.des = friend_events.child("des").getValue().toString();
-                    event.name = friend_events.child("eventname").getValue().toString();
-                    event.user = myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
-                    event.time_s = friend_events.child("time_S").getValue().toString();
-                    //Log.e(TAG, myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
+                    event.date = my_events.child("date").getValue().toString();
+                    event.des = my_events.child("des").getValue().toString();
+                    event.name = my_events.child("eventname").getValue().toString();
+                    event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
+                    event.time_s = my_events.child("time_S").getValue().toString();
+                    //Log.e(TAG, myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString());
 
                     userList.add(event);
                 }
