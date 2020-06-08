@@ -168,40 +168,28 @@ public class AddEventActivity extends AppCompatActivity {
                 currentUser,
                 spinner.getSelectedItem().toString()
         );
-        /*event.name = String.valueOf(event_name.getText());
-        event.date = String.valueOf(event_date.getText());
-        event.time_s = String.valueOf(event_start_t.getText());
-        event.time_e = String.valueOf(event_end_t.getText());
-        event.visibility = String.valueOf(visibility.getSelectedItem());
-        event.category = String.valueOf(spinner.getSelectedItem());
-        event.des = String.valueOf(event_des.getText());
-        event.user = currentUser;*/
 
-        final Gson gson = new Gson();
-        final String json = gson.toJson(event);
         if(visibility.getSelectedItem().toString().equals("Everyone"))
             databaseReference = database.getReference("Users/"+currentUser+"/events/public");
         else
             databaseReference = database.getReference("Users/"+currentUser+"/events/personal");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(init_flag == 0) {
-
-                    Map<String, Object> temp = new HashMap<>();
-                    //temp.put(String.valueOf((int) dataSnapshot.getChildrenCount() + 1), event);
-                    Log.e(TAG, String.valueOf(event));
-                    databaseReference.setValue(event);
-
-                    startActivity(new Intent(getApplicationContext(), ForumActivity.class));
-                    finish();
-                    init_flag = 1;
+        if(item.getItemId() == R.id.save) {
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (init_flag == 0) {
+                        databaseReference.child(String.valueOf((int)(dataSnapshot.getChildrenCount()+1))).setValue(event);
+                        startActivity(new Intent(getApplicationContext(), ForumActivity.class));
+                        finish();
+                        init_flag = 1;
+                    }
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        }
         return true;
     }
 
@@ -212,7 +200,6 @@ public class AddEventActivity extends AppCompatActivity {
         private String time_e;
         private String des;
         private String user;
-        private String visibility;
         private String category;
 
         public Event(String name, String date, String time_s, String time_e, String des, String user, String category){
@@ -224,5 +211,14 @@ public class AddEventActivity extends AppCompatActivity {
             this.user = user;
             this.category = category;
         }
+
+        public String getEventname(){return name;}
+        public String getDate(){return date;}
+        public String getTime_S(){return time_s;}
+        public String getTime_E(){return time_e;}
+        public String getDes(){return des;}
+        public String getUser(){return user;}
+        public String getCategory(){return category;}
+
     }
 }

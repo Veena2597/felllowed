@@ -68,49 +68,36 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
 
-        DatabaseReference databaseReference = database.getReference("Events");
+        DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull final DataSnapshot events_parent) {
+            public void onDataChange(@NonNull final DataSnapshot myEvents) {
                 if(userList != null)
                     userList.clear();
-                for(DataSnapshot events_uid : events_parent.getChildren()) {
-                    if (events_uid.getKey().equals(currentUser)) {
-                        for (DataSnapshot events_num : events_uid.getChildren()) {
-                            data = String.valueOf(events_num.getValue());
-                            if (init_flag == 0) {
-                                userList = getListData(data, new ArrayList<EventItem>());
-                                init_flag = 1;
-                            } else{
-                                userList = getListData(data, userList);
-                            }
-                        }
-                    }
+                for(DataSnapshot friend_events: myEvents.child(currentUser+"/events/personal").getChildren()){
 
-                    if(events_uid.getKey().equals("everyone")){
-                        for(DataSnapshot events_everyone : events_uid.getChildren()){
-                            if(events_everyone.getKey().equals(currentUser)){
-                                for(DataSnapshot events_user: events_everyone.getChildren()){
-                                    Log.e("123", String.valueOf(events_user));
-                                    data = String.valueOf(events_user.getValue());
-                                    Log.e("234",data);
-                                    if (init_flag == 0) {
-                                        userList = getListData(data, new ArrayList<EventItem>());
-                                        init_flag = 1;
-                                    } else {
-                                        userList = getListData(data, userList);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                    Event event = new Event();
+                    event.date = friend_events.child("date").getValue().toString();
+                    event.des = friend_events.child("des").getValue().toString();
+                    event.name = friend_events.child("eventname").getValue().toString();
+                    event.user = myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                    event.time_s = friend_events.child("time_S").getValue().toString();
+                    //Log.e(TAG, myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
 
-                if(init_flag == 0){
-                    String samdata = "{\"date\":\"X\",\"des\":\"Please add events to view them here\",\"name\":\"Welcome\",\"time_e\":\"00:00\",\"time_s\":\"00:00\",\"user\":\"Fellowed\"}";
-                    userList = getListData(samdata, new ArrayList<EventItem>());
-                    init_flag = 1;
+                    userList.add(event);
                 }
+                for(DataSnapshot friend_events: myEvents.child(currentUser+"/events/public").getChildren()){
+                    Event event = new Event();
+                    event.date = friend_events.child("date").getValue().toString();
+                    event.des = friend_events.child("des").getValue().toString();
+                    event.name = friend_events.child("eventname").getValue().toString();
+                    event.user = myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                    event.time_s = friend_events.child("time_S").getValue().toString();
+                    //Log.e(TAG, myEvents.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
+
+                    userList.add(event);
+                }
+                
                 final MyEventsActivity.CustomListAdapter adapter = new MyEventsActivity.CustomListAdapter(MyEventsActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -127,21 +114,6 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
                 EventItem user = (EventItem) lv.getItemAtPosition(position);
             }
         });
-    }
-
-    private ArrayList getListData(String data, ArrayList<EventItem> arrayList) {
-        ArrayList<EventItem> results = arrayList;//new ArrayList<>();
-        EventItem user1 = new EventItem();
-        Gson gson = new Gson();
-        MyEventsActivity.Event event = gson.fromJson(data, MyEventsActivity.Event.class);
-        user1.setEventName(event.name);
-        user1.setEventDate(event.date);
-        user1.setEventTime(event.time_s);
-        user1.setEventDes(event.des);
-        user1.setUserName(event.user);
-        results.add(user1);
-
-        return results;
     }
 
     @Override
@@ -223,7 +195,40 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         private String time_e;
         private String des;
         private String user;
-        private String visibility;
-        private String category;
+
+        public String getname() {
+            return name;
+        }
+        public String getEventDate() {
+            return date;
+        }
+        public String getEventTime() {
+            return time_s;
+        }
+        public String getEventDes() {
+            return des;
+        }
+        public String getUserName(){
+            return user;
+        }
+        public void setname(String name) {
+            this.name = name;
+        }
+
+        public void setdate(String date) {
+            this.date = date;
+        }
+
+        public void setdes(String des) {
+            this.des = des;
+        }
+
+        public void settime_s(String time_s) {
+            this.time_s = time_s;
+        }
+
+        public void setuser(String user) {
+            this.user = user;
+        }
     }
 }
