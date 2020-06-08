@@ -55,7 +55,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
-    static NavigationView navigationView;
+    NavigationView navigationView;
 
     final String TAG = "forum";
     FirebaseDatabase database;
@@ -63,12 +63,11 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     DataSnapshot events_parent;
     String data;
     ArrayList userList;
-    ArrayList eventList;
+    ArrayList creatorList;
     ArrayList userFriendsList;
     ArrayList userFriendsUidList;
     UserData userData = new UserData();
     TextView navUsername;
-
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
 
@@ -80,7 +79,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
-
+        //Where's waldo?
         //Navigation drawer related parameter
         toolbar = findViewById(R.id.appToolbar);
         setSupportActionBar(toolbar);
@@ -144,6 +143,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             @Override
             public void onDataChange(@NonNull DataSnapshot users_parent) {
                 userList = new ArrayList();
+                creatorList = new ArrayList();
                 userFriendsList = new ArrayList();
                 userFriendsUidList = new ArrayList();
                 userData.setUsername(users_parent.child(currentUser).child("username").getValue().toString());
@@ -158,8 +158,9 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                         event.des = friend_events.child("des").getValue().toString();
                         event.name = friend_events.child("eventname").getValue().toString();
                         event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                        creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
                         event.time_s = friend_events.child("time_S").getValue().toString();
-                        Log.e(TAG, users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
+                        event.visibility = friend_events.child("visibility").getValue().toString();
 
                         userList.add(event);
                     }
@@ -169,8 +170,9 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                         event.des = friend_events.child("des").getValue().toString();
                         event.name = friend_events.child("eventname").getValue().toString();
                         event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                        creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
                         event.time_s = friend_events.child("time_S").getValue().toString();
-                        Log.e(TAG, users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString());
+                        event.visibility = friend_events.child("visibility").getValue().toString();
 
                         userList.add(event);
                     }
@@ -180,7 +182,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
 
-                //Log.e(TAG, String.valueOf((userFriendsList)));
                 userData.setFriendslist(userFriendsList);
                 userData.setFriendslist(userFriendsUidList);
             }
@@ -194,7 +195,14 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
                 Intent intent = new Intent(ForumActivity.this, RequestActivity.class);
-                intent.putExtra("event", String.valueOf(eventList.get(position)));
+                Event event= (Event) userList.get(position);
+                intent.putExtra("event_name",event.name);
+                intent.putExtra("event_des",event.des);
+                intent.putExtra("event_date",event.date);
+                intent.putExtra("event_time_s",event.time_s);
+                //intent.putExtra("event_category",event.);
+                intent.putExtra("event_visibility",event.visibility);
+                intent.putExtra("event_creator",String.valueOf(creatorList.get(position)));
                 startActivity(intent);
             }
         });
@@ -253,19 +261,19 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 break;
             case R.id.notifcations:
                 intent = new Intent(ForumActivity.this, NotificationActivity.class);
-                intent.putExtra("userdata", userData);
+                intent.putExtra("userdata", (Serializable) userData);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.myevents:
                 intent = new Intent(ForumActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", userData);
+                intent.putExtra("userdata", (Serializable) userData);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.signout:
                 intent = new Intent(ForumActivity.this, LoginActivity.class);
-                intent.putExtra("userdata", userData);
+                intent.putExtra("userdata", (Serializable) userData);
                 startActivity(intent);
                 finish();
                 break;
@@ -361,6 +369,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         private String time_e;
         private String des;
         private String user;
+        private String visibility;
 
         public String getname() {
             return name;

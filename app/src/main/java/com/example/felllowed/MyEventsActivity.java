@@ -29,17 +29,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class MyEventsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     FirebaseDatabase database;
     String currentUser;
     ListView lv;
-    String data;
     ArrayList userList;
-    ForumActivity.UserData userdata;
-    int init_flag;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -54,23 +50,19 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        init_flag = 0;
-
         lv = findViewById(R.id.myevents);
 
         //Navigation drawer related parameter
         toolbar = findViewById(R.id.appToolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        ForumActivity.navigationView.setNavigationItemSelectedListener(this);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
-
-        Intent mydata = getIntent();
-        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -78,14 +70,13 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             public void onDataChange(@NonNull final DataSnapshot myEvents) {
                 userList = new ArrayList();
                 for(DataSnapshot my_events: myEvents.child(currentUser+"/events/personal").getChildren()){
-
+                    Log.e("rer",my_events.getValue().toString());
                     Event event = new Event();
                     event.date = my_events.child("date").getValue().toString();
                     event.des = my_events.child("des").getValue().toString();
                     event.name = my_events.child("eventname").getValue().toString();
                     event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
                     event.time_s = my_events.child("time_S").getValue().toString();
-                    //Log.e(TAG, myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString());
 
                     userList.add(event);
                 }
@@ -96,11 +87,15 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
                     event.name = my_events.child("eventname").getValue().toString();
                     event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
                     event.time_s = my_events.child("time_S").getValue().toString();
-                    //Log.e(TAG, myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString());
 
+                    Log.e("MEA2",event.name);
+                    Log.e("MEA2",event.date);
+                    Log.e("MEA2",event.des);
+                    Log.e("MEA2",event.time_s);
+                    Log.e("ME2A",event.user);
                     userList.add(event);
                 }
-                
+                if(true){}
                 final MyEventsActivity.CustomListAdapter adapter = new MyEventsActivity.CustomListAdapter(MyEventsActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -114,7 +109,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-                EventItem user = (EventItem) lv.getItemAtPosition(position);
+                //Intent intent = new Intent(MyEventsActivity.);
             }
         });
     }
@@ -125,22 +120,18 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         switch (menuItem.getItemId()){
             case R.id.home:
                 intent = new Intent(MyEventsActivity.this, ForumActivity.class);
-                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             case R.id.find_friends:
                 intent = new Intent(MyEventsActivity.this, FindUsersActivity.class);
-                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             case R.id.notifcations:
                 intent = new Intent(MyEventsActivity.this, NotificationActivity.class);
-                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             case R.id.friends:
                 intent = new Intent(MyEventsActivity.this, FriendsActivity.class);
-                intent.putExtra("userdata", (Serializable) userdata);
                 startActivity(intent);
                 break;
             default:
@@ -176,7 +167,8 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             if (v == null) {
                 v = layoutInflater.inflate(R.layout.list_row, null);
             }
-            EventItem eventItem = (EventItem) getItem(position);
+            //EventItem eventItem = (EventItem) getItem(position);
+            Event eventItem = (Event) getItem(position);
 
             TextView eventName = v.findViewById(R.id.list_name);
             TextView eventDate = v.findViewById(R.id.list_date);
@@ -184,7 +176,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             TextView eventuser = v.findViewById(R.id.list_user);
             final TextView eventdes = v.findViewById(R.id.list_des);
 
-            eventName.setText(eventItem.getEventName());
+            eventName.setText(eventItem.getname());
             eventDate.setText(eventItem.getEventDate());
             eventTime.setText(eventItem.getEventTime());
             eventdes.setText(eventItem.getEventDes());

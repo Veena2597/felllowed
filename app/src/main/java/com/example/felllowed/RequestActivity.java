@@ -16,8 +16,11 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -25,31 +28,49 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RequestActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+    DatabaseReference databaseReference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request);
 
         Intent intent = getIntent();
-        String event_str = intent.getStringExtra("event");
+        final String eventName = intent.getStringExtra("event_name");
+        final String eventDes = intent.getStringExtra("event_des");
+        String eventDate = intent.getStringExtra("event_date");
+        String eventTime_s = intent.getStringExtra("event_time_s");
+        final String eventVisibility = intent.getStringExtra("event_visibility");
+        final String eventCreator = intent.getStringExtra("event_creator");
 
-        Gson gson = new Gson();
-        final String event_key = event_str.substring(21,22);
-        Event event = gson.fromJson(event_str.substring(32,event_str.length()-2),Event.class);
-        final String creator = event.user;
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         Button joinButton = findViewById(R.id.joinBtn);
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(RequestActivity.this,"JOIN : pending approval",Toast.LENGTH_SHORT).show();
+                if(eventVisibility.equals("Everyone")){
+                    databaseReference = database.getReference("Users/"+eventCreator+"/events/public");
+                }
+                else{
+                    databaseReference = database.getReference("Users/"+eventCreator+"/events/personal");
+                }
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot event_num : dataSnapshot.getChildren()){
+                            if(event_num.child("eventname").getValue().toString().equals(eventName)){
+                                databaseReference.child(event_num.getKey()).child("join").child(currentUser).setValue(0);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DatabaseReference databaseReference = database.getReference("Users").child(creator).child("notif_join").child(event_key);
-                Map<String, Object> temp = new HashMap<>();
-                temp.put(currentUser,0);
-                databaseReference.setValue(temp);
+                    }
+                });
+
                 finish();
             }
         });
@@ -59,14 +80,27 @@ public class RequestActivity extends AppCompatActivity implements NavigationView
             @Override
             public void onClick(View v) {
                 Toast.makeText(RequestActivity.this,"REQUEST : pending approval",Toast.LENGTH_SHORT).show();
-                EditText itemText = findViewById(R.id.reqTxt);
+                final EditText itemText = findViewById(R.id.reqTxt);
+                if(eventVisibility.equals("Everyone")){
+                    databaseReference = database.getReference("Users/"+eventCreator+"/events/public");
+                }
+                else{
+                    databaseReference = database.getReference("Users/"+eventCreator+"/events/personal");
+                }
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot event_num : dataSnapshot.getChildren()){
+                            if(event_num.child("eventname").getValue().toString().equals(eventName)){
+                                databaseReference.child(event_num.getKey()).child("req").child(currentUser).setValue(itemText.getText().toString());
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DatabaseReference databaseReference = database.getReference("Users").child(creator).child("notif_req").child(event_key);
-                Map<String, Object> temp = new HashMap<>();
-                temp.put(currentUser,String.valueOf(itemText.getText()));
-                databaseReference.setValue(temp);
+                    }
+                });
                 finish();
             }
         });

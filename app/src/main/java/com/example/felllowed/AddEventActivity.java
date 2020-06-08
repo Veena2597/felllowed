@@ -166,7 +166,8 @@ public class AddEventActivity extends AppCompatActivity {
                 event_end_t.getText().toString(),
                 event_des.getText().toString(),
                 currentUser,
-                spinner.getSelectedItem().toString()
+                spinner.getSelectedItem().toString(),
+                visibility.getSelectedItem().toString()
         );
 
         if(visibility.getSelectedItem().toString().equals("Everyone"))
@@ -201,8 +202,9 @@ public class AddEventActivity extends AppCompatActivity {
         private String des;
         private String user;
         private String category;
+        private String visibility;
 
-        public Event(String name, String date, String time_s, String time_e, String des, String user, String category){
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility){
             this.name = name;
             this.date = date;
             this.time_s = time_s;
@@ -210,6 +212,7 @@ public class AddEventActivity extends AppCompatActivity {
             this.des = des;
             this.user = user;
             this.category = category;
+            this.visibility = visibility;
         }
 
         public String getEventname(){return name;}
@@ -219,6 +222,7 @@ public class AddEventActivity extends AppCompatActivity {
         public String getDes(){return des;}
         public String getUser(){return user;}
         public String getCategory(){return category;}
+        public String getVisibility(){return visibility;}
 
     }
 }
