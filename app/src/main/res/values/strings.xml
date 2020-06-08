@@ -2,9 +2,11 @@
     <string name="app_name">Fellowed</string>
     <string name="close">close</string>
     <string name="open">open</string>
+    <string name="location">Where ?</string>
+    <string name="time">When ?</string>
 
     <string-array name="catergory">
-        <item>Grocery Shoppping</item>
+        <item>Grocery Shopping</item>
         <item>Car Pool</item>
         <item>Party/Gathering</item>
         <item>Others</item>
