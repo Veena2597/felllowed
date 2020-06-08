@@ -169,6 +169,19 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                         }
                     }
                 }
+                for(DataSnapshot events_everyone : events_parent.child("everyone").getChildren()){
+                    if(!events_everyone.getKey().equals(currentUser)) {
+                        for(DataSnapshot event_everyone_user: events_everyone.getChildren()){
+                            data = String.valueOf(event_everyone_user.getValue());
+                            if (init_flag == 0) {
+                                userList = getListData(data, new ArrayList<EventItem>());
+                                init_flag = 1;
+                            } else {
+                                userList = getListData(data, userList);
+                            }
+                        }
+                    }
+                }
                 if(init_flag == 0){
                     String samdata = "{\"date\":\"X\",\"des\":\"Please add events to view them here\",\"name\":\"Welcome\",\"time_e\":\"00:00\",\"time_s\":\"00:00\",\"user\":\"Fellowed\"}";
                     userList = getListData(samdata, new ArrayList<EventItem>());
@@ -296,7 +309,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e(TAG,"add event");
         Intent intent = new Intent(ForumActivity.this, AddEventActivity.class);
         startActivity(intent);
         return true;

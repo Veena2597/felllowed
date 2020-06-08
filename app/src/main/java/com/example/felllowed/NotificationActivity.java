@@ -43,6 +43,7 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
+    DataSnapshot eventDataSnap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,19 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        DatabaseReference eventsDatabase = database.getReference("Events");
+        eventsDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                eventDataSnap = dataSnapshot;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         DatabaseReference databaseReference = database.getReference("Users").child(currentUser);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -117,7 +131,6 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Log.e("FSU","nav");
         Intent intent;
         switch (menuItem.getItemId()){
             case R.id.home:

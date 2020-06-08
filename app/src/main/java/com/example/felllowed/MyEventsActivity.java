@@ -86,6 +86,24 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
                             }
                         }
                     }
+
+                    if(events_uid.getKey().equals("everyone")){
+                        for(DataSnapshot events_everyone : events_uid.getChildren()){
+                            if(events_everyone.getKey().equals(currentUser)){
+                                for(DataSnapshot events_user: events_everyone.getChildren()){
+                                    Log.e("123", String.valueOf(events_user));
+                                    data = String.valueOf(events_user.getValue());
+                                    Log.e("234",data);
+                                    if (init_flag == 0) {
+                                        userList = getListData(data, new ArrayList<EventItem>());
+                                        init_flag = 1;
+                                    } else {
+                                        userList = getListData(data, userList);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if(init_flag == 0){
@@ -128,7 +146,6 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Log.e("FSU","nav");
         Intent intent;
         switch (menuItem.getItemId()){
             case R.id.home:
@@ -206,5 +223,7 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         private String time_e;
         private String des;
         private String user;
+        private String visibility;
+        private String category;
     }
 }

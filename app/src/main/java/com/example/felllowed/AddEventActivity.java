@@ -1,5 +1,6 @@
 package com.example.felllowed;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -23,8 +24,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -36,6 +40,7 @@ import java.util.Map;
 public class AddEventActivity extends AppCompatActivity {
     final String TAG = "AEA";
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference databaseReference;
     final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private EditText event_name;
     private TextView event_date;
@@ -45,6 +50,7 @@ public class AddEventActivity extends AppCompatActivity {
     private Spinner spinner;
     private Spinner visibility;
     private DatePickerDialog.OnDateSetListener onDateSetListener;
+    int init_flag = 0;
     Toolbar toolbar;
 
     @Override
@@ -56,6 +62,8 @@ public class AddEventActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         spinner = findViewById(R.id.category);
+
+        init_flag = 0;
 
         ArrayAdapter<CharSequence> catAdapter = ArrayAdapter.createFromResource(this, R.array.catergory, android.R.layout.simple_spinner_item);
         catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -151,28 +159,53 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e(TAG,"save event");
-        Event event = new Event();
-        event.name = String.valueOf(event_name.getText());
+        final Event event = new Event(
+                event_name.getText().toString(),
+                event_date.getText().toString(),
+                event_start_t.getText().toString(),
+                event_end_t.getText().toString(),
+                event_des.getText().toString(),
+                currentUser,
+                spinner.getSelectedItem().toString()
+        );
+        /*event.name = String.valueOf(event_name.getText());
         event.date = String.valueOf(event_date.getText());
         event.time_s = String.valueOf(event_start_t.getText());
         event.time_e = String.valueOf(event_end_t.getText());
         event.visibility = String.valueOf(visibility.getSelectedItem());
         event.category = String.valueOf(spinner.getSelectedItem());
         event.des = String.valueOf(event_des.getText());
-        event.user = currentUser;
+        event.user = currentUser;*/
 
-        Gson gson = new Gson();
-        String json = gson.toJson(event);
+        final Gson gson = new Gson();
+        final String json = gson.toJson(event);
+        if(visibility.getSelectedItem().toString().equals("Everyone"))
+            databaseReference = database.getReference("Users/"+currentUser+"/events/public");
+        else
+            databaseReference = database.getReference("Users/"+currentUser+"/events/personal");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(init_flag == 0) {
 
-        DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
-        databaseReference.setValue(json);
-        startActivity(new Intent(getApplicationContext(),ForumActivity.class));
-        finish();
+                    Map<String, Object> temp = new HashMap<>();
+                    //temp.put(String.valueOf((int) dataSnapshot.getChildrenCount() + 1), event);
+                    Log.e(TAG, String.valueOf(event));
+                    databaseReference.setValue(event);
+
+                    startActivity(new Intent(getApplicationContext(), ForumActivity.class));
+                    finish();
+                    init_flag = 1;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
         return true;
     }
 
-    class Event{
+    public class Event{
         private String name;
         private String date;
         private String time_s;
@@ -181,5 +214,15 @@ public class AddEventActivity extends AppCompatActivity {
         private String user;
         private String visibility;
         private String category;
+
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category){
+            this.name = name;
+            this.date = date;
+            this.time_s = time_s;
+            this.time_e = time_e;
+            this.des = des;
+            this.user = user;
+            this.category = category;
+        }
     }
 }

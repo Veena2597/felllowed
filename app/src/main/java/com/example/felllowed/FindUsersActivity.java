@@ -164,22 +164,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 });
 
                 addFriend.show();
-                /*
-                new AlertDialog.Builder(FindUsersActivity.this)
-                        .setTitle("Add Friend")
-                        .setMessage("Want to add "+userArray.get(position)+" as friend?")
-                        .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //update friends
-                                Toast.makeText(FindUsersActivity.this, "Added "+userArray.get(position)+" as friend",Toast.LENGTH_SHORT).show();
-                                //register.user.updateFriendsList(userArray.get(position));
-                                Map<String, Object> userUpdates = new HashMap<>();
-                                userUpdates.put(uidArray.get(position), userArray.get(position));
-                                myfrndsRef.updateChildren(userUpdates);
-                            }
-                        })
-                        .setNegativeButton("CANCEL", null)
-                        .show(); */
             }
         });
     }
