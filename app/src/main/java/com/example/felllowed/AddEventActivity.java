@@ -40,6 +40,7 @@ import java.util.Map;
 public class AddEventActivity extends AppCompatActivity {
     final String TAG = "AEA";
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference databaseReference;
     final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private EditText event_name;
     private TextView event_date;
@@ -49,7 +50,7 @@ public class AddEventActivity extends AppCompatActivity {
     private Spinner spinner;
     private Spinner visibility;
     private DatePickerDialog.OnDateSetListener onDateSetListener;
-    private int init_flag = 0;
+    int init_flag = 0;
     Toolbar toolbar;
 
     @Override
@@ -158,33 +159,32 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e(TAG,"save event");
-        Event event = new Event();
-        event.name = String.valueOf(event_name.getText());
-        event.date = String.valueOf(event_date.getText());
-        event.time_s = String.valueOf(event_start_t.getText());
-        event.time_e = String.valueOf(event_end_t.getText());
-        event.visibility = String.valueOf(visibility.getSelectedItem());
-        event.category = String.valueOf(spinner.getSelectedItem());
-        event.des = String.valueOf(event_des.getText());
-        event.user = currentUser;
+        final Event event = new Event(
+                event_name.getText().toString(),
+                event_date.getText().toString(),
+                event_start_t.getText().toString(),
+                event_end_t.getText().toString(),
+                event_des.getText().toString(),
+                currentUser,
+                spinner.getSelectedItem().toString()
+        );
 
-        Gson gson = new Gson();
-        final String json = gson.toJson(event);
-        if(item.getItemId() == R.id.save){
-            final DatabaseReference databaseReference = database.getReference("Events").child(currentUser);
+        if(visibility.getSelectedItem().toString().equals("Everyone"))
+            databaseReference = database.getReference("Users/"+currentUser+"/events/public");
+        else
+            databaseReference = database.getReference("Users/"+currentUser+"/events/personal");
+        if(item.getItemId() == R.id.save) {
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(init_flag == 0) {
-                        Map<String, Object> temp = new HashMap<>();
-                        temp.put(String.valueOf((int) dataSnapshot.getChildrenCount() + 1), json);
-                        databaseReference.updateChildren(temp);
+                    if (init_flag == 0) {
+                        databaseReference.child(String.valueOf((int)(dataSnapshot.getChildrenCount()+1))).setValue(event);
                         startActivity(new Intent(getApplicationContext(), ForumActivity.class));
                         finish();
                         init_flag = 1;
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
@@ -193,14 +193,32 @@ public class AddEventActivity extends AppCompatActivity {
         return true;
     }
 
-    class Event{
+    public class Event{
         private String name;
         private String date;
         private String time_s;
         private String time_e;
         private String des;
         private String user;
-        private String visibility;
         private String category;
+
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category){
+            this.name = name;
+            this.date = date;
+            this.time_s = time_s;
+            this.time_e = time_e;
+            this.des = des;
+            this.user = user;
+            this.category = category;
+        }
+
+        public String getEventname(){return name;}
+        public String getDate(){return date;}
+        public String getTime_S(){return time_s;}
+        public String getTime_E(){return time_e;}
+        public String getDes(){return des;}
+        public String getUser(){return user;}
+        public String getCategory(){return category;}
+
     }
 }
