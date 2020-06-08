@@ -253,7 +253,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         switch (menuItem.getItemId()){
             case R.id.find_friends:
                 intent = new Intent(ForumActivity.this, FindUsersActivity.class);
-                intent.putExtra("userdata", userData);
+                //intent.putExtra("userdata", userData);
                 startActivity(intent);
                 finish();
                 break;
