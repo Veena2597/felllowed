@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -55,6 +57,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -70,12 +75,13 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
     Dialog addFriend;
     Dialog addedFriend;
+    ImageView addimage;
+    ImageView addedimage;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
-    ForumActivity.UserData userdata;
 
     private ArrayList<String> userArray;
     private ArrayList<String> uidArray;
@@ -83,7 +89,9 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     private ListView userList;
 
     Location currentLocation;
+    private StorageReference storageReference;
     FusedLocationProviderClient fusedLocationProviderClient;
+    DatabaseReference profileReference;
 
     private static final int REQUEST_CODE = 101;
 
@@ -111,8 +119,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
 
-        Intent mydata = getIntent();
-        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         //Create new list of users
         userArray = new ArrayList<String>();
@@ -121,6 +127,8 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userArray);
         userList.setAdapter(adapter);
 
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
+        profileReference = database.getReference("Profiles");
         final DatabaseReference myfrndsRef = database.getReference("Users").child(currentuser).child("friends");
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -131,6 +139,9 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 addedFriend = new Dialog(FindUsersActivity.this);
                 addedFriend.setContentView(R.layout.activity_custom_dialog);
 
+                addimage = addFriend.findViewById(R.id.image_addfriends);
+                addedimage = addedFriend.findViewById(R.id.image_addedfriends);
+
                 Button add = addFriend.findViewById(R.id.add_friend_button);
                 TextView username = addFriend.findViewById(R.id.added_username);
                 username.setText(userArray.get(position));
@@ -139,12 +150,44 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 username_dialog.setText(userArray.get(position));
 
                 ImageView cancel = addFriend.findViewById(R.id.cancel_dialog);
-                cancel.setImageDrawable(getDrawable(R.drawable.ic_findfriends));
 
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         addFriend.dismiss();
+                    }
+                });
+
+                profileReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.e("Before cloud","access");
+                        String imagepath = (String) dataSnapshot.child(uidArray.get(position)).getValue();
+                        if(imagepath != null){
+                            storageReference.child(imagepath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    Log.e("After cloud","access");
+                                    Picasso.with(getApplicationContext()).load(uri).fit().into(addedimage);
+                                    Picasso.with(getApplicationContext()).load(uri).fit().into(addimage);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle any errors
+                                }
+                            });
+                        }
+                        else{
+                            addedimage.setImageResource(R.drawable.ic_person_black_24dp);
+                            addimage.setImageResource(R.drawable.ic_person_black_24dp);
+                        }
+                        addFriend.show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
 
@@ -167,8 +210,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                         }, 2000);
                     }
                 });
-
-                addFriend.show();
             }
         });
     }
@@ -227,8 +268,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
 
                             //Add user to list
                             if (user != null) {
-                                Log.e("user", user);
-                                Log.e("key", key);
                                 userArray.add(user);
                                 uidArray.add(key);
                                 adapter.notifyDataSetChanged();
@@ -336,32 +375,41 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Log.e("FSU","nav");
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.home:
-                intent = new Intent(FindUsersActivity.this, ForumActivity.class);
-                intent.putExtra("userdata", userdata);
+        switch (item.getItemId()) {
+            case R.id.find_friends:
+                intent = new Intent(getApplicationContext(), FindUsersActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.friends:
-                intent = new Intent(FindUsersActivity.this, FriendsActivity.class);
-                intent.putExtra("userdata", userdata);
+                intent = new Intent(getApplicationContext(), FriendsActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.notifcations:
-                intent = new Intent(FindUsersActivity.this, NotificationActivity.class);
-                intent.putExtra("userdata", userdata);
+                intent = new Intent(getApplicationContext(), NotificationActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.myevents:
-                intent = new Intent(FindUsersActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", userdata);
+                intent = new Intent(getApplicationContext(), MyEventsActivity.class);
                 startActivity(intent);
+                finish();
+                break;
+            case R.id.rewards:
+                intent = new Intent(getApplicationContext(), RewardsActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.signout:
+                intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
                 break;

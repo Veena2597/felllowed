@@ -9,6 +9,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,37 +34,68 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FriendsActivity extends ForumActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class FriendsActivity extends NavActivity{
 
     GridView gridView;
-    ArrayList friends;
+    String[] friends;
     ArrayList profiles;
+    String[] frnduid;
     private FirebaseDatabase database;
-    ForumActivity.UserData userdata;
     String currentUser;
-    String frndname;
-    String frnduid;
     private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
+        onCreateDrawer();
 
         gridView = findViewById(R.id.friends_grid);
 
-        Intent mydata = getIntent();
-        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
-        Log.e("FA", String.valueOf(userdata.getFriendslist()));
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = getSharedPreferences("FELLOWED", MODE_PRIVATE);
+        friends = gson.fromJson(sharedPreferences.getString("friendslist", null), String[].class);
+        frnduid = gson.fromJson(sharedPreferences.getString("friendsuidlist", null), String[].class);
 
         //Firebase initialization
-        storageReference = FirebaseStorage.getInstance().getReference("Profiles");
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        final DatabaseReference profileReference = database.getReference("Profiles");
+        profileReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                profiles = new ArrayList();
+                for(int i=0; i<friends.length;i++){
+                    FriendItem friendItem = new FriendItem();
+                    friendItem.setName(friends[i]);
+                    //Log.e("Friends", frnduid[i]);
+                    if(dataSnapshot.child(frnduid[i]).getValue() == null){
+                        friendItem.setPictureset(1);
+                    }
+                    else{
+                        friendItem.setPicture((String) dataSnapshot.child(frnduid[i]).getValue());
+                    }
+                    profiles.add(friendItem);
+                }
+
+                final FriendsActivity.CustomGridAdapter adapter = new FriendsActivity.CustomGridAdapter(FriendsActivity.this, profiles);
+                gridView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private class CustomGridAdapter extends BaseAdapter{
@@ -96,7 +130,24 @@ public class FriendsActivity extends ForumActivity implements NavigationView.OnN
             FriendItem friendItem = (FriendItem) getItem(position);
 
             TextView name = convertView.findViewById(R.id.friend_name);
-            ImageView picture = convertView.findViewById(R.id.friend_pic);
+            final ImageView picture = convertView.findViewById(R.id.friend_pic);
+
+            if(friendItem.getPictureset() == 0){
+                storageReference.child(friendItem.getPicture()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.with(getApplicationContext()).load(uri).fit().centerCrop().into(picture);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
+            }
+            else{
+                picture.setImageResource(R.drawable.ic_person_black_24dp);
+            }
 
             name.setText(friendItem.getName());
 
@@ -109,6 +160,15 @@ public class FriendsActivity extends ForumActivity implements NavigationView.OnN
     private class FriendItem{
         String pictureUrl;
         String name;
+        int pictureset = 0;
+
+        public int getPictureset() {
+            return pictureset;
+        }
+
+        public void setPictureset(int pictureset) {
+            this.pictureset = pictureset;
+        }
 
         public String getPicture() {
             return pictureUrl;
@@ -125,10 +185,5 @@ public class FriendsActivity extends ForumActivity implements NavigationView.OnN
         public void setName(String name) {
             this.name = name;
         }
-    }
-
-    private class friendData{
-        private Uri picture;
-        private String name;
     }
 }
