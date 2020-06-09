@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class RequestActivity extends AppCompatActivity{
     DatabaseReference databaseReference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,38 +104,5 @@ public class RequestActivity extends AppCompatActivity implements NavigationView
                 finish();
             }
         });
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.find_friends:
-                intent = new Intent(RequestActivity.this, FindUsersActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.friends:
-                intent = new Intent(RequestActivity.this, FriendsActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.notifcations:
-                intent = new Intent(RequestActivity.this, NotificationActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.myevents:
-                intent = new Intent(RequestActivity.this, MyEventsActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                //if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                //    drawerLayout.closeDrawer(GravityCompat.START);
-                //}
-                break;
-        }
-        return false;
-    }
-
-    class Event{
-        String user;
     }
 }

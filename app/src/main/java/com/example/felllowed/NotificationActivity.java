@@ -34,7 +34,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class NotificationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class NotificationActivity extends NavActivity{
     private ArrayList<String> notifArray;
     private ArrayAdapter adapter;
 
@@ -44,7 +44,6 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
-    ForumActivity.UserData userdata;
     ArrayList reqOnlyList;
     int init_flag = 0;
 
@@ -52,6 +51,9 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+
+        onCreateDrawer();
+        ACTIVITY_ID = NOTIFICATIONS_ID;
 
         init_flag = 0;
 
@@ -74,7 +76,6 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
         actionBarDrawerToggle.syncState();
 
         Intent mydata = getIntent();
-        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -149,38 +150,4 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
             }
         });
     }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.home:
-                intent = new Intent(NotificationActivity.this, ForumActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            case R.id.find_friends:
-                intent = new Intent(NotificationActivity.this, FindUsersActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            case R.id.myevents:
-                intent = new Intent(NotificationActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            case R.id.friends:
-                intent = new Intent(NotificationActivity.this, FriendsActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
-    }
-
 }

@@ -1,21 +1,12 @@
 package com.example.felllowed;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.DefaultDatabaseErrorHandler;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -27,10 +18,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -38,7 +35,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -48,28 +44,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ForumActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    Toolbar toolbar;
-    NavigationView navigationView;
-
+public class ForumActivity extends NavActivity implements NavigationView.OnNavigationItemSelectedListener {
     final String TAG = "forum";
     FirebaseDatabase database;
     String currentUser;
-    DataSnapshot events_parent;
-    String data;
     ArrayList userList;
     ArrayList creatorList;
     ArrayList userFriendsList;
     ArrayList userFriendsUidList;
-    UserData userData = new UserData();
-    TextView navUsername;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     //private ListView eventList;
     private static final int REQUEST_CODE = 101;
@@ -79,28 +67,20 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
-        //Where's waldo?
-        //Navigation drawer related parameter
-        toolbar = findViewById(R.id.appToolbar);
-        setSupportActionBar(toolbar);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        ImageView navImage = (ImageView) headerView.findViewById(R.id.imageView);
-        //navImage.setImageIcon();
-        navUsername = (TextView) headerView.findViewById(R.id.username_header);
+        onCreateDrawer();
+        ACTIVITY_ID = FORUM_ID;
 
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
+        sharedPreferences = getSharedPreferences("FELLOWED", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         //Firebase initialization
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        userData.setUid(currentUser);
+
+        editor.putString("uid", currentUser);
+        editor.commit();
+        editor.apply();
 
         //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -146,34 +126,39 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 creatorList = new ArrayList();
                 userFriendsList = new ArrayList();
                 userFriendsUidList = new ArrayList();
-                userData.setUsername(users_parent.child(currentUser).child("username").getValue().toString());
-                navUsername.setText(users_parent.child(currentUser).child("username").getValue().toString());
+                editor.putString("username",users_parent.child(currentUser).child("username").getValue().toString());
+                editor.commit();
+                editor.apply();
+                setNavHeader(users_parent.child(currentUser).child("username").getValue().toString());
                 for(DataSnapshot user_friends: users_parent.child(currentUser+"/friends").getChildren()){
                     userFriendsList.add(user_friends.getValue().toString());
                     userFriendsUidList.add(user_friends.getValue().toString());
                     for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/personal").getChildren()){
-
-                        Event event = new Event();
-                        event.date = friend_events.child("date").getValue().toString();
-                        event.des = friend_events.child("des").getValue().toString();
-                        event.name = friend_events.child("eventname").getValue().toString();
-                        event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                        Event event = new Event(
+                                friend_events.child("eventname").getValue().toString(),
+                                friend_events.child("date").getValue().toString(),
+                                friend_events.child("time_S").getValue().toString(),
+                                friend_events.child("time_E").getValue().toString(),
+                                friend_events.child("des").getValue().toString(),
+                                users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                friend_events.child("category").getValue().toString(),
+                                friend_events.child("visibility").getValue().toString()
+                        );
                         creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                        event.time_s = friend_events.child("time_S").getValue().toString();
-                        event.visibility = friend_events.child("visibility").getValue().toString();
-
                         userList.add(event);
                     }
                     for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/public").getChildren()){
-                        Event event = new Event();
-                        event.date = friend_events.child("date").getValue().toString();
-                        event.des = friend_events.child("des").getValue().toString();
-                        event.name = friend_events.child("eventname").getValue().toString();
-                        event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                        Event event = new Event(
+                                friend_events.child("eventname").getValue().toString(),
+                                friend_events.child("date").getValue().toString(),
+                                friend_events.child("time_S").getValue().toString(),
+                                friend_events.child("time_E").getValue().toString(),
+                                friend_events.child("des").getValue().toString(),
+                                users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                friend_events.child("category").getValue().toString(),
+                                friend_events.child("visibility").getValue().toString()
+                        );
                         creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                        event.time_s = friend_events.child("time_S").getValue().toString();
-                        event.visibility = friend_events.child("visibility").getValue().toString();
-
                         userList.add(event);
                     }
                 }
@@ -182,8 +167,13 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
 
-                userData.setFriendslist(userFriendsList);
-                userData.setFriendslist(userFriendsUidList);
+                Gson gson = new Gson();
+                String frnds = gson.toJson(userFriendsList);
+                editor.putString("friendslist", frnds);
+                String frndsuid = gson.toJson(userFriendsUidList);
+                editor.putString("friendsuidlist", frndsuid);
+                editor.commit();
+                editor.apply();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -200,7 +190,7 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 intent.putExtra("event_des",event.des);
                 intent.putExtra("event_date",event.date);
                 intent.putExtra("event_time_s",event.time_s);
-                //intent.putExtra("event_category",event.);
+
                 intent.putExtra("event_visibility",event.visibility);
                 intent.putExtra("event_creator",String.valueOf(creatorList.get(position)));
                 startActivity(intent);
@@ -241,60 +231,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                     .setNegativeButton("CANCEL", null)
                     .show();
         }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.find_friends:
-                intent = new Intent(ForumActivity.this, FindUsersActivity.class);
-                //intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.friends:
-                intent = new Intent(ForumActivity.this, FriendsActivity.class);
-                intent.putExtra("userdata", userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.notifcations:
-                intent = new Intent(ForumActivity.this, NotificationActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.myevents:
-                intent = new Intent(ForumActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.signout:
-                intent = new Intent(ForumActivity.this, LoginActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                intent.putExtra("logout",1);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.about:
-                intent = new Intent(ForumActivity.this,AppInfoActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-            case R.id.rewards:
-                intent = new Intent(ForumActivity.this,RewardsActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
     }
 
     @Override
@@ -362,100 +298,49 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             ImageView profilepic = v.findViewById(R.id.profile_pic);
             profilepic.setImageResource(R.drawable.logo_1_launcher);
 
-            eventName.setText(eventItem.getname());
-            eventDate.setText(eventItem.getEventDate());
-            eventTime.setText(eventItem.getEventTime());
-            eventdes.setText(eventItem.getEventDes());
-            eventuser.setText(eventItem.getUserName());
+            eventName.setText(eventItem.getEventname());
+            eventDate.setText(eventItem.getDate());
+            eventTime.setText(eventItem.getTime_S());
+            eventdes.setText(eventItem.getDes());
+            eventuser.setText(eventItem.getUser());
 
             v.setTag(eventItem);
             return v;
         }
     }
 
-    class Event{
+    public class Event{
         private String name;
         private String date;
         private String time_s;
         private String time_e;
         private String des;
         private String user;
+        private String category;
         private String visibility;
 
-        public String getname() {
-            return name;
-        }
-        public String getEventDate() {
-            return date;
-        }
-        public String getEventTime() {
-            return time_s;
-        }
-        public String getEventDes() {
-            return des;
-        }
-        public String getUserName(){
-            return user;
-        }
-        public void setname(String name) {
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility){
             this.name = name;
-        }
-
-        public void setdate(String date) {
             this.date = date;
-        }
-
-        public void setdes(String des) {
-            this.des = des;
-        }
-
-        public void settime_s(String time_s) {
             this.time_s = time_s;
-        }
-
-        public void setuser(String user) {
+            this.time_e = time_e;
+            this.des = des;
             this.user = user;
+            this.category = category;
+            this.visibility = visibility;
         }
+
+        public String getEventname(){return name;}
+        public String getDate(){return date;}
+        public String getTime_S(){return time_s;}
+        public String getTime_E(){return time_e;}
+        public String getDes(){return des;}
+        public String getUser(){return user;}
+        public String getCategory(){return category;}
+        public String getVisibility(){return visibility;}
+
     }
 
-    static class UserData implements Serializable{
-        public String username;
-        public String uid;
-        public ArrayList friendslist;
-        public ArrayList friendsuidlist;
-
-        public ArrayList getFriendslist() {
-            return friendslist;
-        }
-
-        public ArrayList getFriendsuidlist() {
-            return friendsuidlist;
-        }
-
-        public String getUid() {
-            return uid;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setFriendslist(ArrayList friendslist) {
-            this.friendslist = friendslist;
-        }
-
-        public void setUid(String uid) {
-            this.uid = uid;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public void setFriendsuidlist(ArrayList friendsuidlist) {
-            this.friendsuidlist = friendsuidlist;
-        }
-    }
 }
 
 

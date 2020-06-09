@@ -72,7 +72,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     final String TAG = "FUA";
     public static boolean fromSetting = false;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    final String currentuser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
     Dialog addFriend;
     Dialog addedFriend;
     ImageView addimage;
@@ -129,7 +129,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
 
         storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         profileReference = database.getReference("Profiles");
-        final DatabaseReference myfrndsRef = database.getReference("Users").child(currentuser).child("friends");
+        final DatabaseReference myfrndsRef = database.getReference("Users").child(currentUser).child("friends");
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -234,7 +234,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
 
         DatabaseReference myRef = database.getReference("LocationGeo");
         GeoFire geoFire = new GeoFire(myRef);
-        geoFire.setLocation(currentuser, new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
+        geoFire.setLocation(currentUser, new GeoLocation(currentLocation.getLatitude(), currentLocation.getLongitude()));
 
         /*//Dummy
         //geoFire.setLocation("test0", new GeoLocation(34.417772, -119.859786));
@@ -261,7 +261,7 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         //Get user and add marker in map
                         final String user = dataSnapshot.getValue(String.class);
-                        if (!key.equals(currentuser)) {
+                        if (!key.equals(currentUser)) {
                             LatLng latLng = new LatLng(location.latitude, location.longitude);
                             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(user).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
                             googleMap.addMarker(markerOptions);
@@ -378,6 +378,11 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
+            case R.id.home:
+                intent = new Intent(getApplicationContext(), ForumActivity.class);
+                startActivity(intent);
+                finish();
+                break;
             case R.id.find_friends:
                 intent = new Intent(getApplicationContext(), FindUsersActivity.class);
                 startActivity(intent);
@@ -405,6 +410,11 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
                 break;
             case R.id.signout:
                 intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.about:
+                intent = new Intent(getApplicationContext(), AppInfoActivity.class);
                 startActivity(intent);
                 finish();
                 break;

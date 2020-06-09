@@ -81,7 +81,7 @@
             android:id="@+id/Email"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFFF"
+            android:textColor="#FFFFFF"
             android:fontFamily="casual"
             android:textSize="18sp"
             android:layout_gravity="center_vertical"
@@ -118,7 +118,7 @@
             android:id="@+id/password"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFFF"
+            android:textColor="#FFFFFF"
             android:fontFamily="casual"
             android:textSize="18sp"
             android:layout_gravity="center_vertical"
@@ -159,6 +159,7 @@
             />
 
         <TextView
+            android:id="@+id/createText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"

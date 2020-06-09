@@ -36,6 +36,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     static int NOTIFICATIONS_ID = 4;
     static int FIND_FRIENDS_ID = 5;
     static int REWARDS_ID = 6;
+    static int APP_INFO = 7;
 
 
     protected void onCreateDrawer() {
@@ -75,6 +76,11 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
+            case R.id.home:
+                intent = new Intent(getApplicationContext(), ForumActivity.class);
+                startActivity(intent);
+                finish();
+                break;
             case R.id.find_friends:
                 intent = new Intent(getApplicationContext(), FindUsersActivity.class);
                 startActivity(intent);
@@ -102,6 +108,11 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 break;
             case R.id.signout:
                 intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.about:
+                intent = new Intent(getApplicationContext(), AppInfoActivity.class);
                 startActivity(intent);
                 finish();
                 break;

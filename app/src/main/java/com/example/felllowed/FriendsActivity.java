@@ -1,20 +1,10 @@
 package com.example.felllowed;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -22,9 +12,10 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,7 +27,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class FriendsActivity extends NavActivity{
@@ -46,7 +36,6 @@ public class FriendsActivity extends NavActivity{
     ArrayList profiles;
     String[] frnduid;
     private FirebaseDatabase database;
-    String currentUser;
     private StorageReference storageReference;
 
     @Override
@@ -65,7 +54,6 @@ public class FriendsActivity extends NavActivity{
         //Firebase initialization
         storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         database = FirebaseDatabase.getInstance();
-        currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         final DatabaseReference profileReference = database.getReference("Profiles");
         profileReference.addValueEventListener(new ValueEventListener() {

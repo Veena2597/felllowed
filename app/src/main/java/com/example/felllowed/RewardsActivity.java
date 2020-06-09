@@ -13,12 +13,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class RewardsActivity extends AppCompatActivity {
+public class RewardsActivity extends NavActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rewards);
+
+        onCreateDrawer();
+        ACTIVITY_ID = NOTIFICATIONS_ID;
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();

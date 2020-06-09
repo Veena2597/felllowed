@@ -73,20 +73,11 @@ public class RegisterActivity extends AppCompatActivity {
         mProfile = findViewById(R.id.profile);
 
         fAuth = FirebaseAuth.getInstance();
-        progressBar = findViewById(R.id.progressBar);
 
 
         // Write a message to the database
         storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         database = FirebaseDatabase.getInstance();
-
-
-        //Check if user already exists and redirects if yes
-        /*
-        if(fAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(),ForumActivity.class));
-            finish();
-        }*/
 
         mProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,7 +85,6 @@ public class RegisterActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 Log.e("RA", "hello1");
                 startActivityForResult(intent, PICK_IMAGE_REQUEST);
-                //finish();
             }
         });
 

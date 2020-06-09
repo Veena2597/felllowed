@@ -64,6 +64,7 @@
 
 
     <ImageView
+        android:id="@+id/profile"
         android:layout_width="150dp"
         android:layout_height="150dp"
         app:layout_constraintBottom_toTopOf="@+id/lguidelineh1"

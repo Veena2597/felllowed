@@ -33,17 +33,11 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class MyEventsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MyEventsActivity extends NavActivity{
     FirebaseDatabase database;
     String currentUser;
     ListView lv;
     ArrayList userList;
-
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    Toolbar toolbar;
-    NavigationView navigationView;
-
     CustomListAdapter adapter;
     DatabaseReference removeData;
 
@@ -51,23 +45,13 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_events);
+        ACTIVITY_ID = MYEVENTS_ID;
+        onCreateDrawer();
 
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         lv = findViewById(R.id.myevents);
-
-        //Navigation drawer related parameter
-        toolbar = findViewById(R.id.appToolbar);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
 
         DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -132,42 +116,12 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
 
                             }
                         });
-                        //userList.remove(position);
                     }
                 })
                 .setNegativeButton("No",null)
                 .show();
             }
         });
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.home:
-                intent = new Intent(MyEventsActivity.this, ForumActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.find_friends:
-                intent = new Intent(MyEventsActivity.this, FindUsersActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.notifcations:
-                intent = new Intent(MyEventsActivity.this, NotificationActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.friends:
-                intent = new Intent(MyEventsActivity.this, FriendsActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
     }
 
     class CustomListAdapter extends BaseAdapter {
