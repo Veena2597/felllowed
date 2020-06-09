@@ -30,7 +30,7 @@ public class RewardsActivity extends NavActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 TextView pointsText = findViewById(R.id.pointsText);
-                pointsText.setText("Points: " + dataSnapshot.getValue().toString());
+                pointsText.setText(dataSnapshot.getValue().toString());
             }
 
             @Override
