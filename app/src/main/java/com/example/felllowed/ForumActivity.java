@@ -1,5 +1,14 @@
 package com.example.felllowed;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.DefaultDatabaseErrorHandler;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -18,16 +28,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -35,6 +39,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -44,9 +49,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class ForumActivity extends NavActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ForumActivity extends NavActivity {
+
     final String TAG = "forum";
     FirebaseDatabase database;
     String currentUser;
@@ -54,6 +63,7 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
     ArrayList creatorList;
     ArrayList userFriendsList;
     ArrayList userFriendsUidList;
+
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
     SharedPreferences sharedPreferences;
@@ -67,7 +77,6 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
-
         onCreateDrawer();
         ACTIVITY_ID = FORUM_ID;
 
@@ -117,6 +126,19 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
         //Logging the user event forum
         final ListView lv = findViewById(R.id.events);
 
+        DatabaseReference profileReference = database.getReference("Profiles");
+        profileReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String dp = String.valueOf(dataSnapshot.child(currentUser).getValue());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //Logging the friends event forum
         final DatabaseReference friend_events = database.getReference("Users");
         friend_events.addValueEventListener(new ValueEventListener() {
@@ -126,13 +148,15 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
                 creatorList = new ArrayList();
                 userFriendsList = new ArrayList();
                 userFriendsUidList = new ArrayList();
+
                 editor.putString("username",users_parent.child(currentUser).child("username").getValue().toString());
                 editor.commit();
                 editor.apply();
+                //navUsername.setText(users_parent.child(currentUser).child("username").getValue().toString());
                 setNavHeader(users_parent.child(currentUser).child("username").getValue().toString());
                 for(DataSnapshot user_friends: users_parent.child(currentUser+"/friends").getChildren()){
                     userFriendsList.add(user_friends.getValue().toString());
-                    userFriendsUidList.add(user_friends.getValue().toString());
+                    userFriendsUidList.add(user_friends.getKey().toString());
                     for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/personal").getChildren()){
                         Event event = new Event(
                                 friend_events.child("eventname").getValue().toString(),
@@ -190,7 +214,7 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
                 intent.putExtra("event_des",event.des);
                 intent.putExtra("event_date",event.date);
                 intent.putExtra("event_time_s",event.time_s);
-
+                //intent.putExtra("event_category",event.);
                 intent.putExtra("event_visibility",event.visibility);
                 intent.putExtra("event_creator",String.valueOf(creatorList.get(position)));
                 startActivity(intent);
@@ -231,36 +255,6 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
                     .setNegativeButton("CANCEL", null)
                     .show();
         }
-    }
-
-    @Override
-    public void onBackPressed(){
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        toolbar.inflateMenu(R.menu.options);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener () {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return onOptionsItemSelected(item);
-            }
-        });
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e(TAG,"add event");
-        Intent intent = new Intent(ForumActivity.this, AddEventActivity.class);
-        startActivity(intent);
-        return true;
     }
 
     class CustomListAdapter extends BaseAdapter {
@@ -340,7 +334,6 @@ public class ForumActivity extends NavActivity implements NavigationView.OnNavig
         public String getVisibility(){return visibility;}
 
     }
-
 }
 
 

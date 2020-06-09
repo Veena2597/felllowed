@@ -5,7 +5,126 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RequestActivity">
-    <!-- App Toolbar-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/lguidelinev1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/lguidelinev2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/lguidelineh1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35"/>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/lguidelineh3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/lguidelineh4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/lguidelineh5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8"/>
+
+    <RadioGroup
+        android:id="@+id/radiobuttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/lguidelineh1"
+        app:layout_constraintEnd_toEndOf="@id/lguidelinev2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/lguidelinev1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <RadioButton
+            android:id="@+id/radio_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:text="Join the event"
+            android:textSize="30sp"
+            tools:ignore="OnClick" />
+
+        <RadioButton
+            android:id="@+id/radio_req"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:lineSpacingExtra="24sp"
+            android:text="Request for Items"
+            android:textSize="30sp" />
+
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/reqTxt"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/lguidelineh3"
+        app:layout_constraintEnd_toEndOf="@id/lguidelinev2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/lguidelinev1"
+        app:layout_constraintTop_toTopOf="@id/lguidelineh1"
+        app:layout_constraintVertical_bias="0"
+
+        android:hint="Message"/>
+
+    <Button
+        android:id="@+id/reqBtn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Join/Request"
+    android:fontFamily="@font/chewy"
+    android:textSize="28sp"
+    app:layout_constraintBottom_toTopOf="@+id/lguidelineh4"
+    app:layout_constraintEnd_toEndOf="@id/lguidelinev2"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="@+id/lguidelinev1"
+    app:layout_constraintTop_toTopOf="@id/lguidelineh3"
+    app:layout_constraintVertical_bias="0.5"
+    />
+
+    <Button
+        android:id="@+id/reqcancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:fontFamily="@font/chewy"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/lguidelineh5"
+        app:layout_constraintEnd_toEndOf="@id/lguidelinev2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/lguidelinev1"
+        app:layout_constraintTop_toTopOf="@id/lguidelineh4"
+        app:layout_constraintVertical_bias="0.5"
+        />
+
+    <!--
     <EditText
         android:id="@+id/reqTxt"
         android:layout_width="329dp"
@@ -43,5 +162,5 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" /> App Toolbar-->
 </androidx.constraintlayout.widget.ConstraintLayout>

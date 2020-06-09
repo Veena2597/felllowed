@@ -147,7 +147,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //toolbar.inflateMenu(R.menu.options);
+        if(ACTIVITY_ID == FORUM_ID){
+            toolbar.inflateMenu(R.menu.options);
+        }
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener () {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
