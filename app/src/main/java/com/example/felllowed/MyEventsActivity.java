@@ -1,6 +1,7 @@
 package com.example.felllowed;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -41,6 +43,9 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
+
+    CustomListAdapter adapter;
+    DatabaseReference removeData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,34 +74,22 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             @Override
             public void onDataChange(@NonNull final DataSnapshot myEvents) {
                 userList = new ArrayList();
-                for(DataSnapshot my_events: myEvents.child(currentUser+"/events/personal").getChildren()){
-                    Log.e("rer",my_events.getValue().toString());
-                    Event event = new Event();
-                    event.date = my_events.child("date").getValue().toString();
-                    event.des = my_events.child("des").getValue().toString();
-                    event.name = my_events.child("eventname").getValue().toString();
-                    event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
-                    event.time_s = my_events.child("time_S").getValue().toString();
-
-                    userList.add(event);
+                for(DataSnapshot event_type: myEvents.child(currentUser+"/events").getChildren()){
+                    for(DataSnapshot my_events : event_type.getChildren()) {
+                        Event event = new Event(
+                                my_events.child("eventname").getValue().toString(),
+                                my_events.child("date").getValue().toString(),
+                                my_events.child("time_S").getValue().toString(),
+                                my_events.child("time_E").getValue().toString(),
+                                my_events.child("des").getValue().toString(),
+                                myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                my_events.child("category").getValue().toString(),
+                                my_events.child("visibility").getValue().toString()
+                        );
+                        userList.add(event);
+                    }
                 }
-                for(DataSnapshot my_events: myEvents.child(currentUser+"/events/public").getChildren()){
-                    Event event = new Event();
-                    event.date = my_events.child("date").getValue().toString();
-                    event.des = my_events.child("des").getValue().toString();
-                    event.name = my_events.child("eventname").getValue().toString();
-                    event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
-                    event.time_s = my_events.child("time_S").getValue().toString();
-
-                    Log.e("MEA2",event.name);
-                    Log.e("MEA2",event.date);
-                    Log.e("MEA2",event.des);
-                    Log.e("MEA2",event.time_s);
-                    Log.e("ME2A",event.user);
-                    userList.add(event);
-                }
-                if(true){}
-                final MyEventsActivity.CustomListAdapter adapter = new MyEventsActivity.CustomListAdapter(MyEventsActivity.this, userList);
+                adapter = new MyEventsActivity.CustomListAdapter(MyEventsActivity.this, userList);
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
             }
@@ -108,8 +101,42 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-                //Intent intent = new Intent(MyEventsActivity.);
+            public void onItemClick(AdapterView<?> a, View v, final int position, long id) {
+                new AlertDialog.Builder(v.getContext())
+                .setMessage("Do you want to delete this event?")
+                .setTitle("Delete Event")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final Event event = (Event) userList.get(position);
+                        if(event.visibility.equals("Everyone")){
+                            removeData = database.getReference("Users/"+currentUser+"/events/public");
+                        }
+                        else{
+                            removeData = database.getReference("Users/"+currentUser+"/events/personal");
+                        }
+                        removeData.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for(DataSnapshot event_num : dataSnapshot.getChildren()){
+                                    if(event_num.child("eventname").getValue().toString().equals(event.name)){
+                                        removeData.child(event_num.getKey()).removeValue();
+                                        userList.remove(position);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        //userList.remove(position);
+                    }
+                })
+                .setNegativeButton("No",null)
+                .show();
             }
         });
     }
@@ -176,58 +203,46 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
             TextView eventuser = v.findViewById(R.id.list_user);
             final TextView eventdes = v.findViewById(R.id.list_des);
 
-            eventName.setText(eventItem.getname());
-            eventDate.setText(eventItem.getEventDate());
-            eventTime.setText(eventItem.getEventTime());
-            eventdes.setText(eventItem.getEventDes());
-            eventuser.setText(eventItem.getUserName());
+            eventName.setText(eventItem.getEventname());
+            eventDate.setText(eventItem.getDate());
+            eventTime.setText(eventItem.getTime_S());
+            eventdes.setText(eventItem.getDes());
+            eventuser.setText(eventItem.getUser());
 
             v.setTag(eventItem);
             return v;
         }
     }
 
-    class Event{
+    public class Event{
         private String name;
         private String date;
         private String time_s;
         private String time_e;
         private String des;
         private String user;
+        private String category;
+        private String visibility;
 
-        public String getname() {
-            return name;
-        }
-        public String getEventDate() {
-            return date;
-        }
-        public String getEventTime() {
-            return time_s;
-        }
-        public String getEventDes() {
-            return des;
-        }
-        public String getUserName(){
-            return user;
-        }
-        public void setname(String name) {
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility){
             this.name = name;
-        }
-
-        public void setdate(String date) {
             this.date = date;
-        }
-
-        public void setdes(String des) {
-            this.des = des;
-        }
-
-        public void settime_s(String time_s) {
             this.time_s = time_s;
+            this.time_e = time_e;
+            this.des = des;
+            this.user = user;
+            this.category = category;
+            this.visibility = visibility;
         }
 
-        public void setuser(String user) {
-            this.user = user;
-        }
+        public String getEventname(){return name;}
+        public String getDate(){return date;}
+        public String getTime_S(){return time_s;}
+        public String getTime_E(){return time_e;}
+        public String getDes(){return des;}
+        public String getUser(){return user;}
+        public String getCategory(){return category;}
+        public String getVisibility(){return visibility;}
+
     }
 }

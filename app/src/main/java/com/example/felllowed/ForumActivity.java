@@ -274,9 +274,20 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
             case R.id.signout:
                 intent = new Intent(ForumActivity.this, LoginActivity.class);
                 intent.putExtra("userdata", (Serializable) userData);
+                intent.putExtra("logout",1);
                 startActivity(intent);
                 finish();
                 break;
+            case R.id.about:
+                intent = new Intent(ForumActivity.this,AppInfoActivity.class);
+                intent.putExtra("userdata", (Serializable) userData);
+                startActivity(intent);
+                finish();
+            case R.id.rewards:
+                intent = new Intent(ForumActivity.this,RewardsActivity.class);
+                intent.putExtra("userdata", (Serializable) userData);
+                startActivity(intent);
+                finish();
             default:
                 if(drawerLayout.isDrawerOpen(GravityCompat.START)){
                     drawerLayout.closeDrawer(GravityCompat.START);

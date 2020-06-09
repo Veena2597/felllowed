@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -51,6 +52,7 @@ public class AddEventActivity extends AppCompatActivity {
     private Spinner visibility;
     private DatePickerDialog.OnDateSetListener onDateSetListener;
     int init_flag = 0;
+    int rewards_flag = 0;
     Toolbar toolbar;
 
     @Override
@@ -179,10 +181,32 @@ public class AddEventActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (init_flag == 0) {
-                        databaseReference.child(String.valueOf((int)(dataSnapshot.getChildrenCount()+1))).setValue(event);
+                        int event_num = 0;
+                        for(DataSnapshot eventNum : dataSnapshot.getChildren())
+                            event_num = Integer.parseInt(eventNum.getKey());
+                        databaseReference.child(String.valueOf(event_num+1)).setValue(event);
                         startActivity(new Intent(getApplicationContext(), ForumActivity.class));
                         finish();
                         init_flag = 1;
+
+                        if((int)(dataSnapshot.getChildrenCount()) < 5){
+                            Toast.makeText(AddEventActivity.this, "Reward: 20 points",Toast.LENGTH_SHORT).show();
+                            final DatabaseReference rewardsData = database.getReference("Rewards").child(currentUser);
+                            rewardsData.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(rewards_flag == 0) {
+                                        rewardsData.setValue(Integer.parseInt(dataSnapshot.getValue().toString()) + 20);
+                                        rewards_flag = 1;
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
                     }
                 }
 

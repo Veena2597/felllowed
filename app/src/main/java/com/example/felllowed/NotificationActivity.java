@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,14 +44,18 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
-    DataSnapshot eventDataSnap;
     ForumActivity.UserData userdata;
+    ArrayList reqOnlyList;
+    int init_flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
+        init_flag = 0;
+
+        reqOnlyList = new ArrayList();
         notifArray = new ArrayList<String>();
         notifList = findViewById(R.id.notifList);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notifArray);
@@ -71,7 +76,7 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
         Intent mydata = getIntent();
         userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference databaseReference = database.getReference("Users");
@@ -91,6 +96,7 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
                             notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
                                     " has requested for event: "+
                                     public_event.child("eventname").getValue().toString());
+                            reqOnlyList.add(notifArray.size()-1);
                         //}
                     }
                 }
@@ -106,6 +112,7 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
                         notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
                                 " has requested for event: "+
                                 personal_event.child("eventname").getValue().toString());
+                        reqOnlyList.add(notifArray.size()-1);
                     }
                 }
 
@@ -114,6 +121,31 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+        notifList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(reqOnlyList.contains(position)){
+                    Toast.makeText(NotificationActivity.this,"Reward : 10 points",Toast.LENGTH_SHORT).show();
+                    final DatabaseReference rewardsData = database.getReference("Rewards").child(currentUser);
+                    rewardsData.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(init_flag == 0) {
+                                rewardsData.setValue(Integer.parseInt(dataSnapshot.getValue().toString()) + 10);
+                                init_flag = 1;
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
         });
     }

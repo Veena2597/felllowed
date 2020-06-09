@@ -46,6 +46,14 @@ public class LoginActivity extends AppCompatActivity {
         mCreateBtn = findViewById(R.id.createText);
         forgotTextLink = findViewById(R.id.forgotPassword);
 
+        Intent intent = getIntent();
+        Integer logout_flag = intent.getIntExtra("logout",0);
+
+        if(fAuth.getCurrentUser() != null && logout_flag == 0){
+            startActivity(new Intent(getApplicationContext(),ForumActivity.class));
+            finish();
+        }
+
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
