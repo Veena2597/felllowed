@@ -108,6 +108,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 break;
             case R.id.signout:
                 intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.putExtra("logout",1);
                 startActivity(intent);
                 finish();
                 break;
