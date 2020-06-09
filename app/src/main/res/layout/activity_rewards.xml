@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RewardsActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -14,131 +15,183 @@
         android:layout_height="wrap_content"
         layout="@layout/nav_toolbar" />
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="154dp"
-        android:layout_height="184dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_coins" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelinev1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
 
-    <TextView
-        android:id="@+id/pointsText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="Points: "
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelinev2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
 
-    <TableLayout
-        android:id="@+id/points_table"
-        android:layout_width="361dp"
-        android:layout_height="242dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pointsText">
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="?attr/actionBarSize" />
 
-        <TableRow
-            android:id="@+id/table_title"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.6" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.9" />
+
+
+        <ImageView
+            app:layout_constraintBottom_toBottomOf="@id/guidelineh2"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh1"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:srcCompat="@drawable/medal"
+            android:layout_height="250dp"
+            android:layout_width="250dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/guidelineh3"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh2"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5"
+            >
             <TextView
-                android:id="@+id/textView10"
-                android:layout_width="103dp"
-                android:layout_height="match_parent"
-                android:layout_column="0"
-                android:layout_gravity="center"
-                android:text="Activity"
-                android:textSize="24sp"
+                android:id="@+id/pointsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:text="Points"
+                android:textSize="26sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView9"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_column="1"
-                android:layout_gravity="center"
-                android:text="Points earned"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </TableRow>
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="5dp"
 
-        <TableRow
-            android:id="@+id/table_initial"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                android:src="@drawable/ic_monetization_on_black_24dp"/>
+        </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/guidelineh4"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh3"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="First 5 events"
-                android:textSize="24sp" />
+                app:layout_constraintBottom_toBottomOf="@id/guidelineh4"
+                app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+                app:layout_constraintStart_toStartOf="@id/guidelinev1"
+                app:layout_constraintTop_toTopOf="@id/guidelineh3"
+                app:layout_constraintVertical_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.5"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Create 5 events"
+                    android:fontFamily="casual"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="20 coins"
+                    android:textAlignment="textEnd"
+                    android:fontFamily="casual"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="20"
-                android:textSize="24sp" />
-        </TableRow>
+                app:layout_constraintBottom_toBottomOf="@id/guidelineh4"
+                app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+                app:layout_constraintStart_toStartOf="@id/guidelinev1"
+                app:layout_constraintTop_toTopOf="@id/guidelineh3"
+                app:layout_constraintVertical_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.5"
+                android:orientation="horizontal">
 
-        <TableRow
-            android:id="@+id/table_accept"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Accept Request"
+                    android:fontFamily="casual"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="10 coins"
+                    android:textAlignment="textEnd"
+                    android:fontFamily="casual"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView14"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Fulfilling\nrequests"
-                android:textSize="24sp" />
+                app:layout_constraintBottom_toBottomOf="@id/guidelineh4"
+                app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+                app:layout_constraintStart_toStartOf="@id/guidelinev1"
+                app:layout_constraintTop_toTopOf="@id/guidelineh3"
+                app:layout_constraintVertical_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.5"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView13"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="10"
-                android:textSize="24sp" />
-        </TableRow>
+                <TextView
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Refer a friend"
+                    android:fontFamily="casual"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="50 coins"
+                    android:textAlignment="textEnd"
+                    android:fontFamily="casual"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <TableRow
-            android:id="@+id/table_referral"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Referrals"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/textView15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="50"
-                android:textSize="24sp" />
-        </TableRow>
-    </TableLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.navigation.NavigationView
         android:layout_width="match_parent"

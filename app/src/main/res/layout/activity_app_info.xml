@@ -7,68 +7,135 @@
     android:layout_height="match_parent"
     tools:context=".AppInfoActivity">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <include
+            layout="@layout/nav_toolbar"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelinev1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            layout="@layout/nav_toolbar" />
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelinev2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="?attr/actionBarSize" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.65" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineh4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.85" />
+
+
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="234dp"
-            android:layout_height="244dp"
-            android:layout_marginTop="68dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/logo_1_launcher" />
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:layout_constraintBottom_toBottomOf="@id/guidelineh2"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh1"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:src="@drawable/logo_1_launcher"/>
 
         <TextView
             android:id="@+id/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
             android:text="Fellowed"
-            android:textSize="30sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            android:textSize="38sp"
+            android:fontFamily="@font/chewy"
+            app:layout_constraintBottom_toBottomOf="@id/guidelineh3"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh2"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5" />
 
-        <TextView
-            android:id="@+id/app_version"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Version: 1.0.0"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_name" />
+            app:layout_constraintBottom_toBottomOf="@id/guidelineh3"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh4"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:orientation="vertical" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="casual"
+                android:layout_gravity="center_horizontal"
+                android:text="Version 1.0.0"
+                android:textStyle="bold"
+                android:textSize="20sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="casual"
+                android:layout_gravity="center_horizontal"
+                android:text="Developers"
+                android:textStyle="bold"
+                android:textSize="22sp" />
 
-        <TextView
-            android:id="@+id/app_devs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Developers: Aashvij, Veena"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_version" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="casual"
+                android:text="Aashvij, Veena"
+                android:textStyle="bold"
+                android:textSize="22sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/app_contact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:text="Contact: support@fellowed.com"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_devs" />
+            android:textStyle="bold"
+            android:fontFamily="casual"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guidelinev2"
+            app:layout_constraintStart_toStartOf="@id/guidelinev1"
+            app:layout_constraintTop_toTopOf="@id/guidelineh4"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -79,8 +146,7 @@
         app:menu="@menu/drawer_menu"
         app:headerLayout="@layout/nav_header"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        >
+        android:fitsSystemWindows="true">
 
     </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>
