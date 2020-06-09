@@ -3,7 +3,6 @@ package com.example.felllowed;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +18,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
-
-import java.io.Serializable;
 
 public class NavActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     DrawerLayout drawerLayout;
@@ -141,7 +138,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
             drawerLayout.closeDrawer(GravityCompat.START);
         }
         else{
-            super.onBackPressed();
+            //super.onBackPressed();
+            Intent intent = new Intent(getApplicationContext(),ForumActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -160,7 +159,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e("NA","add event");
         if(ACTIVITY_ID == FORUM_ID && item.getItemId() == R.id.add_event_menu){
             Intent intent = new Intent(getApplicationContext(), AddEventActivity.class);
             startActivity(intent);

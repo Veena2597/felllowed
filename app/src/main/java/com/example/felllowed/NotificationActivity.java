@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 public class NotificationActivity extends NavActivity {
     private ArrayList<String> notifArray;
     private ArrayAdapter adapter;
+    ArrayList reqOnlyList;
+    int init_flag = 0;
 
     private ListView notifList;
 
@@ -46,12 +49,15 @@ public class NotificationActivity extends NavActivity {
         onCreateDrawer();
         ACTIVITY_ID = NOTIFICATIONS_ID;
 
+        init_flag = 0;
+        reqOnlyList = new ArrayList();
+
         notifArray = new ArrayList<String>();
         notifList = findViewById(R.id.notifList);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notifArray);
         notifList.setAdapter(adapter);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference databaseReference = database.getReference("Users");
@@ -67,11 +73,10 @@ public class NotificationActivity extends NavActivity {
                         }
                     }
                     for(DataSnapshot joins : public_event.child("req").getChildren()){
-                        //if(joins.getValue().toString().equals("0")){
-                            notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
+                        notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
                                     " has requested for event: "+
                                     public_event.child("eventname").getValue().toString());
-                        //}
+                        reqOnlyList.add(notifArray.size()-1);
                     }
                 }
                 for(DataSnapshot personal_event : events_snap.child(currentUser+"/events").child("personal").getChildren()){
@@ -86,6 +91,7 @@ public class NotificationActivity extends NavActivity {
                         notifArray.add(events_snap.child(joins.getKey()).child("username").getValue().toString() +
                                 " has requested for event: "+
                                 personal_event.child("eventname").getValue().toString());
+                        reqOnlyList.add(notifArray.size()-1);
                     }
                 }
 
@@ -94,6 +100,30 @@ public class NotificationActivity extends NavActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+        notifList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(reqOnlyList.contains(position)){
+                    Toast.makeText(NotificationActivity.this,"Reward : 10 points",Toast.LENGTH_SHORT).show();
+                    final DatabaseReference rewardsData = database.getReference("Rewards").child(currentUser);
+                    rewardsData.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(init_flag == 0) {
+                                rewardsData.setValue(Integer.parseInt(dataSnapshot.getValue().toString()) + 10);
+                                init_flag = 1;
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
         });
     }
