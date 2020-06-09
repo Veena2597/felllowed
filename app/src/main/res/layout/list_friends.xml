@@ -13,11 +13,15 @@
 
         <TextView
             android:id="@+id/friend_name"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
+            android:layout_marginStart="10dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_below="@id/friend_pic"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/chewy"
+            android:textAlignment="center"
+            android:text="hello"
             android:textColor="#000000"
-            android:textSize="18sp"
-            android:fontFamily="@font/atomic_age" />
+            android:textSize="18sp" />
 
 </RelativeLayout>

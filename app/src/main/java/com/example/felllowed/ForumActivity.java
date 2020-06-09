@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.DefaultDatabaseErrorHandler;
 import android.location.Location;
@@ -50,26 +51,25 @@ import com.google.gson.Gson;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class ForumActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
+public class ForumActivity extends NavActivity {
+
     Toolbar toolbar;
     NavigationView navigationView;
 
     final String TAG = "forum";
     FirebaseDatabase database;
     String currentUser;
-    DataSnapshot events_parent;
-    String data;
     ArrayList userList;
     ArrayList creatorList;
     ArrayList userFriendsList;
     ArrayList userFriendsUidList;
-    UserData userData = new UserData();
-    TextView navUsername;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     //private ListView eventList;
     private static final int REQUEST_CODE = 101;
@@ -79,29 +79,19 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
-        //Where's waldo?
-        //Navigation drawer related parameter
-        toolbar = findViewById(R.id.appToolbar);
-        setSupportActionBar(toolbar);
+        onCreateDrawer();
+        ACTIVITY_ID = FORUM_ID;
 
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        ImageView navImage = (ImageView) headerView.findViewById(R.id.imageView);
-        //navImage.setImageIcon();
-        navUsername = (TextView) headerView.findViewById(R.id.username_header);
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
+        sharedPreferences = getSharedPreferences("FELLOWED", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         //Firebase initialization
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        userData.setUid(currentUser);
 
+        editor.putString("uid", currentUser);
+        editor.commit();
+        editor.apply();
         //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         checkLocationEnabled(locationManager);
@@ -137,6 +127,19 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
         //Logging the user event forum
         final ListView lv = findViewById(R.id.events);
 
+        DatabaseReference profileReference = database.getReference("Profiles");
+        profileReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String dp = String.valueOf(dataSnapshot.child(currentUser).getValue());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //Logging the friends event forum
         final DatabaseReference friend_events = database.getReference("Users");
         friend_events.addValueEventListener(new ValueEventListener() {
@@ -146,11 +149,14 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 creatorList = new ArrayList();
                 userFriendsList = new ArrayList();
                 userFriendsUidList = new ArrayList();
-                userData.setUsername(users_parent.child(currentUser).child("username").getValue().toString());
-                navUsername.setText(users_parent.child(currentUser).child("username").getValue().toString());
+                editor.putString("username",users_parent.child(currentUser).child("username").getValue().toString());
+                editor.commit();
+                editor.apply();
+                //navUsername.setText(users_parent.child(currentUser).child("username").getValue().toString());
+                setNavHeader(users_parent.child(currentUser).child("username").getValue().toString());
                 for(DataSnapshot user_friends: users_parent.child(currentUser+"/friends").getChildren()){
                     userFriendsList.add(user_friends.getValue().toString());
-                    userFriendsUidList.add(user_friends.getValue().toString());
+                    userFriendsUidList.add(user_friends.getKey().toString());
                     for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/personal").getChildren()){
 
                         Event event = new Event();
@@ -182,8 +188,13 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                 lv.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
 
-                userData.setFriendslist(userFriendsList);
-                userData.setFriendslist(userFriendsUidList);
+                Gson gson = new Gson();
+                String frnds = gson.toJson(userFriendsList);
+                editor.putString("friendslist", frnds);
+                String frndsuid = gson.toJson(userFriendsUidList);
+                editor.putString("friendsuidlist", frndsuid);
+                editor.commit();
+                editor.apply();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -241,79 +252,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
                     .setNegativeButton("CANCEL", null)
                     .show();
         }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.find_friends:
-                intent = new Intent(ForumActivity.this, FindUsersActivity.class);
-                //intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.friends:
-                intent = new Intent(ForumActivity.this, FriendsActivity.class);
-                intent.putExtra("userdata", userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.notifcations:
-                intent = new Intent(ForumActivity.this, NotificationActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.myevents:
-                intent = new Intent(ForumActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.signout:
-                intent = new Intent(ForumActivity.this, LoginActivity.class);
-                intent.putExtra("userdata", (Serializable) userData);
-                startActivity(intent);
-                finish();
-                break;
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
-    }
-
-    @Override
-    public void onBackPressed(){
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        toolbar.inflateMenu(R.menu.options);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener () {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return onOptionsItemSelected(item);
-            }
-        });
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e(TAG,"add event");
-        Intent intent = new Intent(ForumActivity.this, AddEventActivity.class);
-        startActivity(intent);
-        return true;
     }
 
     class CustomListAdapter extends BaseAdapter {
@@ -404,45 +342,6 @@ public class ForumActivity extends AppCompatActivity implements NavigationView.O
 
         public void setuser(String user) {
             this.user = user;
-        }
-    }
-
-    static class UserData implements Serializable{
-        public String username;
-        public String uid;
-        public ArrayList friendslist;
-        public ArrayList friendsuidlist;
-
-        public ArrayList getFriendslist() {
-            return friendslist;
-        }
-
-        public ArrayList getFriendsuidlist() {
-            return friendsuidlist;
-        }
-
-        public String getUid() {
-            return uid;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setFriendslist(ArrayList friendslist) {
-            this.friendslist = friendslist;
-        }
-
-        public void setUid(String uid) {
-            this.uid = uid;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public void setFriendsuidlist(ArrayList friendsuidlist) {
-            this.friendsuidlist = friendsuidlist;
         }
     }
 }

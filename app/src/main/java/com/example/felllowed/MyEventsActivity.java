@@ -31,7 +31,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class MyEventsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MyEventsActivity extends NavActivity{
     FirebaseDatabase database;
     String currentUser;
     ListView lv;
@@ -46,6 +46,8 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_events);
+        onCreateDrawer();
+        ACTIVITY_ID = MYEVENTS_ID;
 
         database = FirebaseDatabase.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -63,6 +65,8 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+
+
 
         DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -88,11 +92,6 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
                     event.user = myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString();
                     event.time_s = my_events.child("time_S").getValue().toString();
 
-                    Log.e("MEA2",event.name);
-                    Log.e("MEA2",event.date);
-                    Log.e("MEA2",event.des);
-                    Log.e("MEA2",event.time_s);
-                    Log.e("ME2A",event.user);
                     userList.add(event);
                 }
                 if(true){}
@@ -112,35 +111,6 @@ public class MyEventsActivity extends AppCompatActivity implements NavigationVie
                 //Intent intent = new Intent(MyEventsActivity.);
             }
         });
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.home:
-                intent = new Intent(MyEventsActivity.this, ForumActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.find_friends:
-                intent = new Intent(MyEventsActivity.this, FindUsersActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.notifcations:
-                intent = new Intent(MyEventsActivity.this, NotificationActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.friends:
-                intent = new Intent(MyEventsActivity.this, FriendsActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
     }
 
     class CustomListAdapter extends BaseAdapter {

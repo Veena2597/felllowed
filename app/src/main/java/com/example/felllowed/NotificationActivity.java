@@ -33,43 +33,24 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class NotificationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class NotificationActivity extends NavActivity {
     private ArrayList<String> notifArray;
     private ArrayAdapter adapter;
 
     private ListView notifList;
-
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    Toolbar toolbar;
-    NavigationView navigationView;
     DataSnapshot eventDataSnap;
-    ForumActivity.UserData userdata;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+        onCreateDrawer();
+        ACTIVITY_ID = NOTIFICATIONS_ID;
 
         notifArray = new ArrayList<String>();
         notifList = findViewById(R.id.notifList);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notifArray);
         notifList.setAdapter(adapter);
-
-        //Navigation drawer related parameter
-        toolbar = findViewById(R.id.appToolbar);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
-
-        Intent mydata = getIntent();
-        userdata = (ForumActivity.UserData) mydata.getSerializableExtra("userdata");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -117,38 +98,4 @@ public class NotificationActivity extends AppCompatActivity implements Navigatio
             }
         });
     }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        Intent intent;
-        switch (menuItem.getItemId()){
-            case R.id.home:
-                intent = new Intent(NotificationActivity.this, ForumActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            case R.id.find_friends:
-                intent = new Intent(NotificationActivity.this, FindUsersActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            case R.id.myevents:
-                intent = new Intent(NotificationActivity.this, MyEventsActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            case R.id.friends:
-                intent = new Intent(NotificationActivity.this, FriendsActivity.class);
-                intent.putExtra("userdata", userdata);
-                startActivity(intent);
-                break;
-            default:
-                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                }
-                break;
-        }
-        return false;
-    }
-
 }
