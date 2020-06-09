@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -77,6 +78,9 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
     Dialog addedFriend;
     ImageView addimage;
     ImageView addedimage;
+    SharedPreferences sharedPreferences;
+    TextView navUsername;
+    ImageView navImage;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -118,6 +122,19 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+
+        View headerView = navigationView.getHeaderView(0);
+        navImage = headerView.findViewById(R.id.imageView);
+        navUsername = headerView.findViewById(R.id.username_header);
+        sharedPreferences = getSharedPreferences("FELLOWED", MODE_PRIVATE);
+        if(sharedPreferences.getString("username",null) != null){
+            navUsername.setText(sharedPreferences.getString("username",null));
+        }
+
+        /*if(sharedPreferences.getString("uri",null) != null){
+            navImage.setImageURI(Uri.parse(sharedPreferences.getString("uri",null)));
+        }*/
+        navImage.setImageResource(R.mipmap.ic_launcher_round);
 
 
         //Create new list of users

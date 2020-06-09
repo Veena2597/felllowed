@@ -61,9 +61,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
             navUsername.setText(sharedPreferences.getString("username",null));
         }
 
-        if(sharedPreferences.getString("uri",null) != null){
+        /*if(sharedPreferences.getString("uri",null) != null){
             navImage.setImageURI(Uri.parse(sharedPreferences.getString("uri",null)));
-        }
+        }*/
 
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
