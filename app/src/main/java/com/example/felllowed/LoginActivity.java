@@ -45,7 +45,10 @@ public class LoginActivity extends AppCompatActivity {
         mCreateBtn = findViewById(R.id.createText);
         forgotTextLink = findViewById(R.id.forgotPassword);
 
-        if(fAuth.getCurrentUser() != null){
+        Intent intent = getIntent();
+        Integer logout_flag = intent.getIntExtra("logout",0);
+
+        if(fAuth.getCurrentUser() != null && logout_flag == 0){
             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
             finish();
         }
@@ -67,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 progressBar.setVisibility(View.VISIBLE);
+
                 // authenticate the user
                 fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override

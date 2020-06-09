@@ -81,13 +81,14 @@
             android:id="@+id/Email"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:fontFamily="casual"
+            android:textSize="18sp"
             android:layout_gravity="center_vertical"
             android:background="#85e0e0"
-            android:fontFamily="casual"
             android:hint=" Email"
-            android:textColor="#FFFFFF"
-            android:textColorHint="@color/ic_coins_background"
-            android:textSize="18sp" />
+            android:textColorHint="#FFFFFF"
+            />
 
     </LinearLayout>
 

@@ -1,11 +1,7 @@
 package com.example.felllowed;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,6 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,10 +31,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.lang.reflect.Member;
 
 /** Register activity handles :
  * 1. Checking if user already exists and redirects to MainActivity
@@ -79,17 +74,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         fAuth = FirebaseAuth.getInstance();
 
+
         // Write a message to the database
         storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         database = FirebaseDatabase.getInstance();
-
-
-        //Check if user already exists and redirects if yes
-        /*
-        if(fAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(),ForumActivity.class));
-            finish();
-        }*/
 
         mProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +85,6 @@ public class RegisterActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 Log.e("RA", "hello1");
                 startActivityForResult(intent, PICK_IMAGE_REQUEST);
-                //finish();
             }
         });
 
@@ -154,6 +141,9 @@ public class RegisterActivity extends AppCompatActivity {
                             user = new member(userName,email,phone);
                             databaseReference.setValue(user);
                             profileReference.setValue(profileref);
+
+                            DatabaseReference rewardsData = database.getReference("Rewards").child(userID);
+                            rewardsData.setValue(0);
                             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
 
                         }else {
