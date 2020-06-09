@@ -158,28 +158,31 @@ public class ForumActivity extends NavActivity {
                     userFriendsList.add(user_friends.getValue().toString());
                     userFriendsUidList.add(user_friends.getKey().toString());
                     for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/personal").getChildren()){
-
-                        Event event = new Event();
-                        event.date = friend_events.child("date").getValue().toString();
-                        event.des = friend_events.child("des").getValue().toString();
-                        event.name = friend_events.child("eventname").getValue().toString();
-                        event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                        Event event = new Event(
+                                friend_events.child("eventname").getValue().toString(),
+                                friend_events.child("date").getValue().toString(),
+                                friend_events.child("time_S").getValue().toString(),
+                                friend_events.child("time_E").getValue().toString(),
+                                friend_events.child("des").getValue().toString(),
+                                users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                friend_events.child("category").getValue().toString(),
+                                friend_events.child("visibility").getValue().toString()
+                        );
                         creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                        event.time_s = friend_events.child("time_S").getValue().toString();
-                        event.visibility = friend_events.child("visibility").getValue().toString();
-
                         userList.add(event);
                     }
                     for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/public").getChildren()){
-                        Event event = new Event();
-                        event.date = friend_events.child("date").getValue().toString();
-                        event.des = friend_events.child("des").getValue().toString();
-                        event.name = friend_events.child("eventname").getValue().toString();
-                        event.user = users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString();
+                        Event event = new Event(
+                                friend_events.child("eventname").getValue().toString(),
+                                friend_events.child("date").getValue().toString(),
+                                friend_events.child("time_S").getValue().toString(),
+                                friend_events.child("time_E").getValue().toString(),
+                                friend_events.child("des").getValue().toString(),
+                                users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                friend_events.child("category").getValue().toString(),
+                                friend_events.child("visibility").getValue().toString()
+                        );
                         creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                        event.time_s = friend_events.child("time_S").getValue().toString();
-                        event.visibility = friend_events.child("visibility").getValue().toString();
-
                         userList.add(event);
                     }
                 }
@@ -289,60 +292,47 @@ public class ForumActivity extends NavActivity {
             ImageView profilepic = v.findViewById(R.id.profile_pic);
             profilepic.setImageResource(R.drawable.logo_1_launcher);
 
-            eventName.setText(eventItem.getname());
-            eventDate.setText(eventItem.getEventDate());
-            eventTime.setText(eventItem.getEventTime());
-            eventdes.setText(eventItem.getEventDes());
-            eventuser.setText(eventItem.getUserName());
+            eventName.setText(eventItem.getEventname());
+            eventDate.setText(eventItem.getDate());
+            eventTime.setText(eventItem.getTime_S());
+            eventdes.setText(eventItem.getDes());
+            eventuser.setText(eventItem.getUser());
 
             v.setTag(eventItem);
             return v;
         }
     }
 
-    class Event{
+    public class Event{
         private String name;
         private String date;
         private String time_s;
         private String time_e;
         private String des;
         private String user;
+        private String category;
         private String visibility;
 
-        public String getname() {
-            return name;
-        }
-        public String getEventDate() {
-            return date;
-        }
-        public String getEventTime() {
-            return time_s;
-        }
-        public String getEventDes() {
-            return des;
-        }
-        public String getUserName(){
-            return user;
-        }
-        public void setname(String name) {
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility){
             this.name = name;
-        }
-
-        public void setdate(String date) {
             this.date = date;
-        }
-
-        public void setdes(String des) {
-            this.des = des;
-        }
-
-        public void settime_s(String time_s) {
             this.time_s = time_s;
+            this.time_e = time_e;
+            this.des = des;
+            this.user = user;
+            this.category = category;
+            this.visibility = visibility;
         }
 
-        public void setuser(String user) {
-            this.user = user;
-        }
+        public String getEventname(){return name;}
+        public String getDate(){return date;}
+        public String getTime_S(){return time_s;}
+        public String getTime_E(){return time_e;}
+        public String getDes(){return des;}
+        public String getUser(){return user;}
+        public String getCategory(){return category;}
+        public String getVisibility(){return visibility;}
+
     }
 }
 
