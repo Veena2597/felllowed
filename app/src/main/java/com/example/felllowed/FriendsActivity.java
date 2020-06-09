@@ -46,7 +46,6 @@ public class FriendsActivity extends NavActivity{
     ArrayList profiles;
     String[] frnduid;
     private FirebaseDatabase database;
-    String currentUser;
     private StorageReference storageReference;
 
     @Override
@@ -65,7 +64,6 @@ public class FriendsActivity extends NavActivity{
         //Firebase initialization
         storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         database = FirebaseDatabase.getInstance();
-        currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         final DatabaseReference profileReference = database.getReference("Profiles");
         profileReference.addValueEventListener(new ValueEventListener() {

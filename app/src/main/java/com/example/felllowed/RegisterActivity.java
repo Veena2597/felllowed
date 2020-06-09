@@ -78,8 +78,6 @@ public class RegisterActivity extends AppCompatActivity {
         mProfile = findViewById(R.id.profile);
 
         fAuth = FirebaseAuth.getInstance();
-        progressBar = findViewById(R.id.progressBar);
-
 
         // Write a message to the database
         storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");

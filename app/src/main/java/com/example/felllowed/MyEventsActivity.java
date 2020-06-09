@@ -37,11 +37,6 @@ public class MyEventsActivity extends NavActivity{
     ListView lv;
     ArrayList userList;
 
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    Toolbar toolbar;
-    NavigationView navigationView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,20 +48,6 @@ public class MyEventsActivity extends NavActivity{
         currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         lv = findViewById(R.id.myevents);
-
-        //Navigation drawer related parameter
-        toolbar = findViewById(R.id.appToolbar);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open,R.string.close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
-
-
 
         DatabaseReference databaseReference = database.getReference("Users");
         databaseReference.addValueEventListener(new ValueEventListener() {

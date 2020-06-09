@@ -38,7 +38,6 @@ public class NotificationActivity extends NavActivity {
     private ArrayAdapter adapter;
 
     private ListView notifList;
-    DataSnapshot eventDataSnap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

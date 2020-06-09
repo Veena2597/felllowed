@@ -56,9 +56,6 @@ import java.util.Set;
 
 public class ForumActivity extends NavActivity {
 
-    Toolbar toolbar;
-    NavigationView navigationView;
-
     final String TAG = "forum";
     FirebaseDatabase database;
     String currentUser;
@@ -66,6 +63,7 @@ public class ForumActivity extends NavActivity {
     ArrayList creatorList;
     ArrayList userFriendsList;
     ArrayList userFriendsUidList;
+
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest mLocationRequest;
     SharedPreferences sharedPreferences;
@@ -92,6 +90,7 @@ public class ForumActivity extends NavActivity {
         editor.putString("uid", currentUser);
         editor.commit();
         editor.apply();
+
         //Location updates
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         checkLocationEnabled(locationManager);
@@ -149,6 +148,7 @@ public class ForumActivity extends NavActivity {
                 creatorList = new ArrayList();
                 userFriendsList = new ArrayList();
                 userFriendsUidList = new ArrayList();
+
                 editor.putString("username",users_parent.child(currentUser).child("username").getValue().toString());
                 editor.commit();
                 editor.apply();

@@ -102,6 +102,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 break;
             case R.id.signout:
                 intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.putExtra("logout",1);
                 startActivity(intent);
                 finish();
                 break;
@@ -135,7 +136,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //toolbar.inflateMenu(R.menu.options);
+        if(ACTIVITY_ID == FORUM_ID){
+            toolbar.inflateMenu(R.menu.options);
+        }
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener () {
             @Override
             public boolean onMenuItemClick(MenuItem item) {

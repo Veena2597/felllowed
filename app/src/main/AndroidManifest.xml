@@ -21,11 +21,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity android:name=".RegisterActivity"></activity>
-        <activity android:name=".MyEventsActivity" />
-        <activity android:name=".FriendsActivity" >
+        <activity android:name=".MyEventsActivity"/>
+        <activity android:name=".FriendsActivity">
 
         </activity>
-        <activity android:name=".NotificationActivity">
+        <activity android:name=".NotificationActivity"/>
+        <activity android:name=".RewardsActivity">
 
         </activity>
         <activity android:name=".RequestActivity" />
