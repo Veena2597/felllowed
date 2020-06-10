@@ -168,6 +168,8 @@ public class ForumActivity extends NavActivity {
                                     friend_events.child("category").getValue().toString(),
                                     friend_events.child("visibility").getValue().toString()
                             );
+                            Log.e(TAG, users_parent.child(friend_events.child("user").getValue().toString()).getValue().toString());
+                            Log.e("TAG", users_parent.child(friend_events.child("user").getValue().toString()).getKey());
                             creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
                             userList.add(event);
                         }
