@@ -19,6 +19,7 @@ import android.content.pm.PackageManager;
 import android.database.DefaultDatabaseErrorHandler;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +40,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,7 +50,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,6 +74,7 @@ public class ForumActivity extends NavActivity {
     LocationRequest mLocationRequest;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    StorageReference storageReference;
 
     //private ListView eventList;
     private static final int REQUEST_CODE = 101;
@@ -99,9 +106,9 @@ public class ForumActivity extends NavActivity {
         fusedLocationProviderClient = new FusedLocationProviderClient(this);
         mLocationRequest = new LocationRequest();
 
-        mLocationRequest.setInterval(10*1000);
-        mLocationRequest.setFastestInterval(4*1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(60*1000);
+        mLocationRequest.setFastestInterval(50*1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_NO_POWER);
 
         fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, new LocationCallback(){
             @Override
@@ -118,6 +125,7 @@ public class ForumActivity extends NavActivity {
                         DatabaseReference mygeoRef = database.getReference("LocationGeo");
                         GeoFire geoFire = new GeoFire(mygeoRef);
                         geoFire.setLocation(currentUser, new GeoLocation(Latitude, Longitude));
+                        
                     }
                 }
             }
@@ -126,21 +134,9 @@ public class ForumActivity extends NavActivity {
         //Logging the user event forum
         final ListView lv = findViewById(R.id.events);
 
-        DatabaseReference profileReference = database.getReference("Profiles");
-        profileReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String dp = String.valueOf(dataSnapshot.child(currentUser).getValue());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
         //Logging the friends event forum
-        final DatabaseReference friend_events = database.getReference("Users");
+        final DatabaseReference friend_events = database.getReferenceFromUrl("https://fellowed-a5hvee.firebaseio.com/");
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         friend_events.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot users_parent) {
@@ -149,28 +145,29 @@ public class ForumActivity extends NavActivity {
                 userFriendsList = new ArrayList();
                 userFriendsUidList = new ArrayList();
 
-                editor.putString("username",users_parent.child(currentUser).child("username").getValue().toString());
+                editor.putString("username",users_parent.child("Users").child(currentUser).child("username").getValue().toString());
                 editor.commit();
                 editor.apply();
-                setNavHeader(users_parent.child(currentUser).child("username").getValue().toString());
-                for(DataSnapshot user_friends: users_parent.child(currentUser+"/friends").getChildren()){
+                setNavHeader(users_parent.child("Users").child(currentUser).child("username").getValue().toString());
+                for(DataSnapshot user_friends: users_parent.child("Users").child(currentUser+"/friends").getChildren()){
                     userFriendsList.add(user_friends.getValue().toString());
-                    userFriendsUidList.add(user_friends.getKey().toString());
-                    for(DataSnapshot friends_event_type : users_parent.child(user_friends.getKey()).child("events").getChildren()){
+                    userFriendsUidList.add(user_friends.getKey());
+                    for(DataSnapshot friends_event_type : users_parent.child("Users").child(user_friends.getKey()).child("events").getChildren()){
                         for(DataSnapshot friend_events: friends_event_type.getChildren()){
+                            String useruid = users_parent.child("Users").child(friend_events.child("user").getValue().toString()).getKey();
                             Event event = new Event(
                                     friend_events.child("eventname").getValue().toString(),
                                     friend_events.child("date").getValue().toString(),
                                     friend_events.child("time_S").getValue().toString(),
                                     friend_events.child("time_E").getValue().toString(),
                                     friend_events.child("des").getValue().toString(),
-                                    users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                    users_parent.child("Users").child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
                                     friend_events.child("category").getValue().toString(),
-                                    friend_events.child("visibility").getValue().toString()
+                                    friend_events.child("visibility").getValue().toString(),
+                                    users_parent.child("Profiles").child(useruid).getValue().toString()
                             );
-                            Log.e(TAG, users_parent.child(friend_events.child("user").getValue().toString()).getValue().toString());
-                            Log.e("TAG", users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                            creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
+                            Log.e("TAG","Jere");
+                            creatorList.add(users_parent.child("Users").child(friend_events.child("user").getValue().toString()).getKey());
                             userList.add(event);
                         }
                     }
@@ -286,8 +283,23 @@ public class ForumActivity extends NavActivity {
             TextView eventuser = v.findViewById(R.id.list_user);
             TextView eventdes = v.findViewById(R.id.list_des);
 
-            ImageView profilepic = v.findViewById(R.id.profile_pic);
-            profilepic.setImageResource(R.drawable.logo_1_launcher);
+            final ImageView profilepic = v.findViewById(R.id.profile_pic);
+            if(eventItem.getProfilepic() != null){
+                storageReference.child(eventItem.getProfilepic()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.with(getApplicationContext()).load(uri).fit().centerCrop().into(profilepic);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
+            }
+            else{
+                profilepic.setImageResource(R.drawable.ic_person_black_24dp);
+            }
 
             eventName.setText(eventItem.getEventname());
             eventDate.setText(eventItem.getDate());
@@ -309,8 +321,8 @@ public class ForumActivity extends NavActivity {
         private String user;
         private String category;
         private String visibility;
-
-        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility){
+        private String profilepic;
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility, String profilepic){
             this.name = name;
             this.date = date;
             this.time_s = time_s;
@@ -319,8 +331,8 @@ public class ForumActivity extends NavActivity {
             this.user = user;
             this.category = category;
             this.visibility = visibility;
+            this.profilepic = profilepic;
         }
-
         public String getEventname(){return name;}
         public String getDate(){return date;}
         public String getTime_S(){return time_s;}
@@ -329,7 +341,9 @@ public class ForumActivity extends NavActivity {
         public String getUser(){return user;}
         public String getCategory(){return category;}
         public String getVisibility(){return visibility;}
-
+        public String getProfilepic() {
+            return profilepic;
+        }
     }
 }
 

@@ -3,6 +3,7 @@ package com.example.felllowed;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,6 +24,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -29,7 +33,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -40,6 +47,7 @@ public class MyEventsActivity extends NavActivity{
     ArrayList userList;
     CustomListAdapter adapter;
     DatabaseReference removeData;
+    StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +61,13 @@ public class MyEventsActivity extends NavActivity{
 
         lv = findViewById(R.id.myevents);
 
-        DatabaseReference databaseReference = database.getReference("Users");
+        DatabaseReference databaseReference = database.getReferenceFromUrl("https://fellowed-a5hvee.firebaseio.com/");
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull final DataSnapshot myEvents) {
                 userList = new ArrayList();
-                for(DataSnapshot event_type: myEvents.child(currentUser+"/events").getChildren()){
+                for(DataSnapshot event_type: myEvents.child("Users").child(currentUser+"/events").getChildren()){
                     for(DataSnapshot my_events : event_type.getChildren()) {
                         Event event = new Event(
                                 my_events.child("eventname").getValue().toString(),
@@ -66,9 +75,10 @@ public class MyEventsActivity extends NavActivity{
                                 my_events.child("time_S").getValue().toString(),
                                 my_events.child("time_E").getValue().toString(),
                                 my_events.child("des").getValue().toString(),
-                                myEvents.child(my_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                myEvents.child("Users").child(my_events.child("user").getValue().toString()).child("username").getValue().toString(),
                                 my_events.child("category").getValue().toString(),
-                                my_events.child("visibility").getValue().toString()
+                                my_events.child("visibility").getValue().toString(),
+                                myEvents.child("Profiles").child(currentUser).getValue().toString()
                         );
                         userList.add(event);
                     }
@@ -156,6 +166,23 @@ public class MyEventsActivity extends NavActivity{
             TextView eventTime = v.findViewById(R.id.list_time);
             TextView eventuser = v.findViewById(R.id.list_user);
             final TextView eventdes = v.findViewById(R.id.list_des);
+            final ImageView profilepic = v.findViewById(R.id.profile_pic);
+            if(eventItem.getProfilepic() != null){
+                storageReference.child(eventItem.getProfilepic()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.with(getApplicationContext()).load(uri).fit().centerCrop().into(profilepic);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
+            }
+            else{
+                profilepic.setImageResource(R.drawable.ic_person_black_24dp);
+            }
 
             eventName.setText(eventItem.getEventname());
             eventDate.setText(eventItem.getDate());
@@ -177,8 +204,8 @@ public class MyEventsActivity extends NavActivity{
         private String user;
         private String category;
         private String visibility;
-
-        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility){
+        private String profilepic;
+        public Event(String name, String date, String time_s, String time_e, String des, String user, String category, String visibility, String profilepic){
             this.name = name;
             this.date = date;
             this.time_s = time_s;
@@ -187,8 +214,8 @@ public class MyEventsActivity extends NavActivity{
             this.user = user;
             this.category = category;
             this.visibility = visibility;
+            this.profilepic = profilepic;
         }
-
         public String getEventname(){return name;}
         public String getDate(){return date;}
         public String getTime_S(){return time_s;}
@@ -197,6 +224,8 @@ public class MyEventsActivity extends NavActivity{
         public String getUser(){return user;}
         public String getCategory(){return category;}
         public String getVisibility(){return visibility;}
-
+        public String getProfilepic() {
+            return profilepic;
+        }
     }
 }
