@@ -130,11 +130,24 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         if(sharedPreferences.getString("username",null) != null){
             navUsername.setText(sharedPreferences.getString("username",null));
         }
-
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
+        if(sharedPreferences.getString("profilepic",null) != null){
+            storageReference.child(sharedPreferences.getString("profilepic",null)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.with(getApplicationContext()).load(uri).fit().centerCrop().into(navImage);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
+        }
         /*if(sharedPreferences.getString("uri",null) != null){
             navImage.setImageURI(Uri.parse(sharedPreferences.getString("uri",null)));
         }*/
-        navImage.setImageResource(R.mipmap.ic_launcher_round);
+        //navImage.setImageResource(R.mipmap.ic_launcher_round);
 
 
         //Create new list of users
@@ -144,7 +157,6 @@ public class FindUsersActivity extends FragmentActivity implements OnMapReadyCal
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userArray);
         userList.setAdapter(adapter);
 
-        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
         profileReference = database.getReference("Profiles");
         final DatabaseReference myfrndsRef = database.getReference("Users").child(currentUser).child("friends");
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -17,7 +17,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 public class NavActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     DrawerLayout drawerLayout;
@@ -26,6 +31,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     ImageView navImage;
     TextView navUsername;
     SharedPreferences sharedPreferences;
+    StorageReference storageReference;
     static int ACTIVITY_ID = 0;
     static int FORUM_ID = 1;
     static int MYEVENTS_ID = 2;
@@ -60,10 +66,20 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         if(sharedPreferences.getString("username",null) != null){
             navUsername.setText(sharedPreferences.getString("username",null));
         }
-
-        /*if(sharedPreferences.getString("uri",null) != null){
-            navImage.setImageURI(Uri.parse(sharedPreferences.getString("uri",null)));
-        }*/
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://fellowed-a5hvee.appspot.com");
+        if(sharedPreferences.getString("profilepic",null) != null){
+            storageReference.child(sharedPreferences.getString("profilepic",null)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.with(getApplicationContext()).load(uri).fit().centerCrop().into(navImage);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
+        }
 
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();

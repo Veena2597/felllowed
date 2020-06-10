@@ -125,7 +125,6 @@ public class ForumActivity extends NavActivity {
                         DatabaseReference mygeoRef = database.getReference("LocationGeo");
                         GeoFire geoFire = new GeoFire(mygeoRef);
                         geoFire.setLocation(currentUser, new GeoLocation(Latitude, Longitude));
-                        
                     }
                 }
             }
@@ -146,6 +145,7 @@ public class ForumActivity extends NavActivity {
                 userFriendsUidList = new ArrayList();
 
                 editor.putString("username",users_parent.child("Users").child(currentUser).child("username").getValue().toString());
+                editor.putString("profilepic", String.valueOf(users_parent.child("Profiles").child(currentUser).getValue()));
                 editor.commit();
                 editor.apply();
                 setNavHeader(users_parent.child("Users").child(currentUser).child("username").getValue().toString());
