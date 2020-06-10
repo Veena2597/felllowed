@@ -152,38 +152,25 @@ public class ForumActivity extends NavActivity {
                 editor.putString("username",users_parent.child(currentUser).child("username").getValue().toString());
                 editor.commit();
                 editor.apply();
-                //navUsername.setText(users_parent.child(currentUser).child("username").getValue().toString());
                 setNavHeader(users_parent.child(currentUser).child("username").getValue().toString());
                 for(DataSnapshot user_friends: users_parent.child(currentUser+"/friends").getChildren()){
                     userFriendsList.add(user_friends.getValue().toString());
                     userFriendsUidList.add(user_friends.getKey().toString());
-                    for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/personal").getChildren()){
-                        Event event = new Event(
-                                friend_events.child("eventname").getValue().toString(),
-                                friend_events.child("date").getValue().toString(),
-                                friend_events.child("time_S").getValue().toString(),
-                                friend_events.child("time_E").getValue().toString(),
-                                friend_events.child("des").getValue().toString(),
-                                users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
-                                friend_events.child("category").getValue().toString(),
-                                friend_events.child("visibility").getValue().toString()
-                        );
-                        creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                        userList.add(event);
-                    }
-                    for(DataSnapshot friend_events: users_parent.child(user_friends.getKey()+"/events/public").getChildren()){
-                        Event event = new Event(
-                                friend_events.child("eventname").getValue().toString(),
-                                friend_events.child("date").getValue().toString(),
-                                friend_events.child("time_S").getValue().toString(),
-                                friend_events.child("time_E").getValue().toString(),
-                                friend_events.child("des").getValue().toString(),
-                                users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
-                                friend_events.child("category").getValue().toString(),
-                                friend_events.child("visibility").getValue().toString()
-                        );
-                        creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
-                        userList.add(event);
+                    for(DataSnapshot friends_event_type : users_parent.child(user_friends.getKey()).child("events").getChildren()){
+                        for(DataSnapshot friend_events: friends_event_type.getChildren()){
+                            Event event = new Event(
+                                    friend_events.child("eventname").getValue().toString(),
+                                    friend_events.child("date").getValue().toString(),
+                                    friend_events.child("time_S").getValue().toString(),
+                                    friend_events.child("time_E").getValue().toString(),
+                                    friend_events.child("des").getValue().toString(),
+                                    users_parent.child(friend_events.child("user").getValue().toString()).child("username").getValue().toString(),
+                                    friend_events.child("category").getValue().toString(),
+                                    friend_events.child("visibility").getValue().toString()
+                            );
+                            creatorList.add(users_parent.child(friend_events.child("user").getValue().toString()).getKey());
+                            userList.add(event);
+                        }
                     }
                 }
 

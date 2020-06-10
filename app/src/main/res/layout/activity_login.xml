@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
             android:fontFamily="casual"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:layout_gravity="center_vertical"
             android:background="#85e0e0"
             android:hint=" Email"
@@ -123,6 +123,7 @@
             android:textSize="18sp"
             android:layout_gravity="center_vertical"
             android:background="#85e0e0"
+            android:inputType="textPassword"
             android:hint=" Password"
             android:textColorHint="#FFFFFF"
             /></LinearLayout>

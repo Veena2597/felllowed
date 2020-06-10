@@ -58,11 +58,12 @@ public class RequestActivity extends NavActivity{
                                 if (event_num.child("eventname").getValue().toString().equals(eventName)) {
                                     if(join_status == 1) {
                                         Toast.makeText(RequestActivity.this, "JOIN : pending approval", Toast.LENGTH_SHORT).show();
-                                        databaseReference.child(event_num.getKey()).child("join").child(currentUser).setValue(0);
+                                        databaseReference.child(event_num.getKey()).child("join/"+currentUser).setValue(0);
                                     }
                                     else if (join_status == 2) {
                                         EditText itemText = findViewById(R.id.reqTxt);
-                                        databaseReference.child(event_num.getKey()).child("req").child(currentUser).setValue(itemText.getText().toString());
+                                        databaseReference.child(event_num.getKey()).child("req/"+currentUser+"/flag").setValue(0);
+                                        databaseReference.child(event_num.getKey()).child("req/"+currentUser+"/reqTxt").setValue(itemText.getText().toString());
                                         Toast.makeText(RequestActivity.this, "REQUEST : pending approval", Toast.LENGTH_SHORT).show();
                                     }
                                 }

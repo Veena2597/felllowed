@@ -48,7 +48,6 @@ public class RegisterActivity extends AppCompatActivity {
     Button mRegisterBtn;
     TextView mLoginBtn;
     FirebaseAuth fAuth;
-    ProgressBar progressBar;
     ImageView mProfile;
     String userID;
     StorageReference storageReference;
@@ -110,9 +109,6 @@ public class RegisterActivity extends AppCompatActivity {
                     mPassword.setError("Oops! Password less than 6 Characters");
                     return;
                 }
-
-                progressBar.setVisibility(View.VISIBLE);
-
                 // register the user in firebase
                 fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -148,7 +144,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                         }else {
                             Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -167,7 +162,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void uploadProfile(Uri profileImage){
         if(profileImage != null){
             Log.e("FA", String.valueOf(profileImage));
-            StorageReference fileReference = storageReference.child(userID+ getFileExtension(profileImage));
+            StorageReference fileReference = storageReference.child(userID+"."+getFileExtension(profileImage));
 
             profileref = userID+'.'+ getFileExtension(profileImage);
             Log.e("RA",userID+ getFileExtension(profileImage));

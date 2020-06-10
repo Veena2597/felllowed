@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText mEmail,mPassword;
     Button mLoginBtn;
     TextView mCreateBtn,forgotTextLink;
-    ProgressBar progressBar;
     FirebaseAuth fAuth;
 
     @Override
@@ -69,8 +68,6 @@ public class LoginActivity extends AppCompatActivity {
                     mPassword.setError("Password is Required.");
                     return;
                 }
-                progressBar.setVisibility(View.VISIBLE);
-
                 // authenticate the user
                 fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -80,7 +77,6 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(new Intent(getApplicationContext(),ForumActivity.class));
                         }else {
                             Toast.makeText(LoginActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
                         }
 
                     }
